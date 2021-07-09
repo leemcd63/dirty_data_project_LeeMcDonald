@@ -1,0 +1,63 @@
+---
+title: "Task 2 - Cake Ingredients"
+output: html_notebook
+---
+```{r}
+library(tidyverse)
+library(here)
+```
+
+```{r}
+# Read in cleaned data
+cake_ingredients <- read_csv(here("clean_data/cake_ingredients_cleaned.csv"))
+```
+
+
+## 1. Which cake has the most cocoa in it?
+```{r}
+cake_ingredients %>%
+  filter(ingredient == "Cocoa") %>%
+  slice_max(quantity, n = 1, with_ties = TRUE)
+```
+One Bowl Chocolate cake - 10 tablespoons
+
+
+## 2. For sponge cake, how many cups of ingredients are used in total?
+```{r}
+cake_ingredients %>%
+  group_by(cake) %>%
+  filter(cake == "Sponge", measure == "cup") %>%
+  summarise(total_quantity_cups = sum(quantity))
+
+```
+Sponge cake has 3.5 cups of ingredients
+
+## 3. How many ingredients are measured in teaspoons?
+```{r}
+cake_ingredients %>%
+  group_by(measure) %>%
+  filter(measure == "teaspoon") %>%
+  summarise(ingredient_count = n_distinct(ingredient))
+```
+There are 8 ingredients measured in teaspoons.
+
+
+## 4. Which cake has the most unique ingredients?
+```{r}
+cake_ingredients %>%
+  group_by(cake) %>%
+  summarise(number_of_ingredients = n_distinct(ingredient)) %>%
+  slice_max(number_of_ingredients, n = 1, with_ties = TRUE)
+```
+Both Babas au Rhum and One Bowl Chocolate cake are tied and have 11 ingredients
+
+
+## 5. Which ingredients are used only once?
+```{r}
+cake_ingredients %>%
+  count(ingredient) %>%
+  filter(n == 1)
+```
+
+Bananas, Cream of tartar, crushed ice, dried currants, egg white, nutmeg, nuts and zwiebach are only used once
+
