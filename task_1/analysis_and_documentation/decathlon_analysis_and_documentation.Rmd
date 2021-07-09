@@ -1,0 +1,66 @@
+---
+title: "Task 1 - Decathlon Data"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+```{r}
+decathlon_data <- read_csv(here("clean_data/decathlon_cleaned.csv"))
+```
+
+
+## 1. Who had the longest long jump seen in the data?
+
+```{r}
+decathlon_data %>%
+  select(id, name, long_jump) %>%
+  slice_max(long_jump, with_ties = TRUE)
+```
+Clay had the longest long jump in this dataset.
+
+
+## 2. What was the average 100m time in each competition?
+
+```{r}
+decathlon_data %>%
+  group_by(competition) %>%
+  summarise(avg_100m_time = mean(x100m))
+  
+```
+Average 100m time for Decastar was 11.2s and OlympicG 10.9s
+
+
+## 3. Who had the highest total points across both competitions?
+
+```{r}
+decathlon_data %>%
+  group_by(name) %>%
+  summarise(total_points = sum(points)) %>%
+  slice_max(total_points, with_ties = TRUE)
+```
+Sebrle with 17110 total points
+
+
+## 4. What was the shot-put scores for the top three competitors in each competition?
+
+```{r}
+decathlon_data %>%
+  group_by(competition) %>%
+  slice_min(rank, n = 3) %>%
+  select(name, competition, rank, shot_put)
+```
+
+## 5. What was the average points for competitors who ran the 400m in less than 50 seconds vs. those than ran 400m in more than 50 seconds?
+
+```{r}
+decathlon_data %>%
+  mutate(time_400m = if_else(x400m < 50, "Less than 50s", "More than 50s")) %>%
+  group_by(time_400m) %>%
+  summarise(avg_points = mean(points))
+```
+
