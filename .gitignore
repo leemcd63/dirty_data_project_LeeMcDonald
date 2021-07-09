@@ -7,8 +7,10 @@
 *.pps
 *.ppt
 *.pptx
+*.rds
 *.sdf
 *.tax2010
+*.txt
 *.vcf
 *.xlr
 *.xls
