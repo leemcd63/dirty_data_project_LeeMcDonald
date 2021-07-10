@@ -1,0 +1,65 @@
+---
+title: "Task 3 - Seabirds"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(here)
+
+seabirds <- read_csv(here("clean_data/seabirds_cleaned.csv"))
+```
+
+## 1. Which bird had the most individual sightings?
+```{r}
+seabirds %>%
+  group_by(species_common_name, species_scientific_name, species_abbreviation) %>%
+  summarise(total_sightings = n_distinct(record_id)) %>%
+  ungroup() %>%
+  slice_max(total_sightings)
+```
+Wandering albatross sensu lato PL2	Diomedea antipodensis / exulans PL2 DIOANTEXU PL2	3099
+
+## 2. Which bird had the highest total count?
+```{r}
+seabirds %>% 
+  group_by(species_common_name, species_scientific_name, species_abbreviation) %>%
+  summarise(total_count = sum(count)) %>%
+  ungroup() %>%
+  slice_max(total_count, n = 1, with_ties = TRUE)
+```
+Short-tailed shearwater	Puffinus tenuirostris	PUFTEN	982553
+
+
+## 3. Which bird had the highest total count above a latitude of -30?
+```{r}
+seabirds %>%
+  group_by(species_common_name, species_scientific_name, species_abbreviation) %>%
+  filter(lat > -30) %>%
+  summarise(total_count = sum(count)) %>%
+  ungroup() %>%
+  slice_max(total_count, n = 1, with_ties = TRUE)
+```
+Wedge-tailed shearwater	Puffinus pacificus	PUFPAC	855
+
+
+## 4. How many different types of birds were only ever seen in groups of 1?
+```{r}
+seabirds %>%
+  group_by(species_common_name) %>%
+  summarise(max_group_seen = sum(count) / n_distinct(record_id)) %>%
+  filter(max_group_seen == 1) %>%
+  ungroup() %>%
+  summarise(groups_one_only = sum(max_group_seen))
+```
+86 in groups of one only
+
+
+## 5. How many penguins were seen? (Hint: there are many types of penguin)
+```{r}
+seabirds %>%
+  filter(str_detect(species_common_name, regex("penguin", ignore_case = TRUE))) %>%
+  summarise(number_of_species = n_distinct(species_common_name),
+            total_number_penguins = sum(count))
+```
+158
