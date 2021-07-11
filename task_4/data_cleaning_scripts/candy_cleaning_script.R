@@ -154,12 +154,16 @@ candy_names_recoded <- candy_countries_recoded %>%
   mutate(candy_name = case_when(
     str_detect(candy_name, "Anonymous brown") ~ "Mary Janes",
     str_detect(candy_name, "Raisins") ~ "Box 'o' Raisins",
-    str_detect(candy_name, "the board game") ~ "Bonkers",
+    str_detect(candy_name, "(the candy)") ~ "Bonkers",
     str_detect(candy_name, "JoyJoy") ~ "JoyJoy",
     str_detect(candy_name, "yes black") ~ "Licorice",
+    str_detect(candy_name, "Dark") ~ "Hershey's Dark Chocolate",
+    str_detect(candy_name, "Sweetums") ~ "Sweetums",
     TRUE ~ candy_name)
   )
 
 distinct_candy <- candy_names_recoded %>%
   distinct(candy_name) %>%
   arrange(candy_name)
+
+write_csv(candy_names_recoded, here("clean_data/candy_data_cleaned.csv"))
