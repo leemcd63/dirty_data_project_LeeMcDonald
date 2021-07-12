@@ -36,6 +36,42 @@ rwa_data_trimmed <- rwa_data %>%
          family_size = familysize)
   
 
+rwa_recoded <- rwa_data_trimmed %>%
+  mutate(
+    age = case_when(
+      age <= 100 ~ age,
+      TRUE ~ NA_real_
+    ),
+    gender = case_when(
+      gender == 1 ~ "Male",
+      gender == 2 ~ "Female",
+      gender == 3 ~ "Other",
+      TRUE ~ NA_character_
+    ),
+    hand = case_when(
+      hand == 1 ~ "Right",
+      hand == 2 ~ "Left",
+      hand == 3 ~ "Both",
+      TRUE ~ NA_character_
+    ),
+    urban = case_when(
+      urban == 1 ~ "Rural",
+      urban == 2 ~ "Suburban",
+      urban == 3 ~ "Urban",
+      TRUE ~ NA_character_
+    ),
+    family_size = case_when(
+      family_size <= 50 ~ family_size,
+      TRUE ~ NA_real_
+    ),
+    education = case_when(
+      education == 1 ~ "Less than high school",
+      education == 2 ~ "High school",
+      education == 3 ~ "University degree",
+      education == 4 ~ "Graduate degree",
+      TRUE ~ NA_character_
+    )
+  )
 
-test %>%
-  
+rwa_recoded %>%
+  summarise(across(everything(), ~ sum(is.na(.x))))
