@@ -36,8 +36,9 @@ candy_2015_trimmed <- candy_data_2015 %>%
          year,
          age,
          trick_or_treat,
-         where(~is_rating(.x)),
-         -starts_with("Please"))
+         starts_with("["))
+         #where(~is_rating(.x)),
+         #-starts_with("Please"))
 
 candy_2015_long <- candy_2015_trimmed %>%
   # convert to long format
