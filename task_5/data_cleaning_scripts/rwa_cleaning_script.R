@@ -4,41 +4,38 @@ library(here)
 
 rwa_data <- read_csv(here("raw_data/rwa.csv"))
 
+# Set variables of relevant questions for RWA score
+rwa_score_qs <- c("Q3", "Q5", "Q7", "Q10", "Q12", "Q14", "Q16", "Q17", "Q19", "Q22")
+rwa_score_qs_inv <- c("Q4", "Q6", "Q8", "Q9", "Q11", "Q13", "Q15", "Q18", "Q20", "Q21")
 
-calculate_rwa_score <- function(x) {
-  rwa_score_qs <- c(2, 4, 5, 9, 11, 13, 15, 16, 18, 21)
-  rwa_score_qs_inv <- c(3, 5, 7, 8, 10, 12, 14, 17, 19, 20)
-  
-  for (i in x) {
-    rwa_count = 0
-    for (y in rwa_score_qs) {
-      rwa_count <- rwa_count + i[y]
-    }
-    for (y in rwa_score_qs_inv) {
-      rwa_count <- rwa_count + (10 - i[y])
-    }
-    return(mean(rwa_count))
-  }
-}
 
 rwa_data_trimmed <- rwa_data %>%
-  mutate(id = rownames(rwa_data)) %>%
+  # filter out any rows where a question has a zero value (i.e, not answered)
+  filter(!if_any(starts_with("Q"), ~ . == 0)) %>%
+  # Calculate rwa_score for each row. mean of the sums of answers to each question,
+  # Questions in "inv" variable are reverse scored, take the total away from 90 (max possible)
+  rowwise() %>%
+  mutate(rwa_score_a = sum(c_across(any_of(rwa_score_qs))),
+         rwa_score_b = sum(c_across(any_of(rwa_score_qs_inv))),
+         rwa_score = (rwa_score_a + (100 - rwa_score_b)) / 20) %>%
+  ungroup() %>%
+  # create unique id for each user
+  mutate(id = rownames(.)) %>%
+  # select columns for analysis
   select(id,
-         "Q3":"Q22",
+         rwa_score,
          testelapse,
          gender,
          age,
          hand,
          urban,
          familysize,
-         education)
+         education) %>%
+  # rename a couple
+  rename(time_secs = testelapse,
+         family_size = familysize)
+  
 
-test <- rwa_data_trimmed %>%
-   calculate_rwa_score()
 
-rwa_data_trimmed %>% 
-  sum(cols_only(rwa_score_qs = col_double()))
-
-sum(rwa_data_trimmed[1,rwa_score_qs])
-
-calculate_rwa_score(rwa_data_trimmed)
+test %>%
+  
