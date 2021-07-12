@@ -1,0 +1,73 @@
+---
+title: "Task 5 - RWA Data"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+```{r}
+rwa_data <- read_csv(here("clean_data/rwa_data_cleaned.csv"))
+```
+
+## 1. What’s the average RWA score for each gender?
+```{r}
+rwa_data %>%
+  group_by(gender) %>%
+  summarise(avg_rwa_score = round(mean(rwa_score), 2))
+```
+
+
+## 2. What’s the average RWA score for left handed people vs. right handed people.
+```{r}
+rwa_data %>%
+  group_by(hand) %>%
+  filter(hand %in% c("1. Right", "2. Left")) %>%
+  summarise(avg_rwa_score = round(mean(rwa_score), 2))
+```
+
+
+## 3. What’s the average family size for each type of childhood?
+```{r}
+rwa_data %>%
+  filter(!is.na(family_size)) %>%
+  group_by(urban) %>%
+  summarise(avg_family_size = round(mean(family_size), 2))
+```
+
+
+## 4. What’s the average time to take the test for each education level?
+Perhaps put a reasonable limit on time taken for the absolute anomalies that occur here
+```{r}
+rwa_avg_time_education <- rwa_data %>%
+  filter(!is.na(education),
+         time_secs < 100000) %>%
+  group_by(education) %>%
+  summarise(avg_time_taken = mean(time_secs))
+```
+
+
+## 5. Create a plot of results of question 4.
+```{r}
+ggplot(rwa_avg_time_education, aes(education, avg_time_taken)) +
+  geom_point()
+```
+
+## 6. What’s the average RWA score for people aged:
+## Under 18, 18 to 25, 26 to 40, 41 to 60, Over 60
+```{r}
+rwa_data %>%
+  mutate(age_category = case_when(
+    age < 18 ~ "Under 18",
+    age <= 25 ~ "18 to 25",
+    age <= 40 ~ "26 to 40",
+    age <= 60 ~ "41 to 60",
+    TRUE ~ "Over 60")
+  ) %>%
+  group_by(age_category) %>%
+  summarise(avg_rwa_score = round(mean(rwa_score), 2))
+```
+

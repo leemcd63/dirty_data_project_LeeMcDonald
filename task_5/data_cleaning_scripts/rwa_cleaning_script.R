@@ -43,21 +43,21 @@ rwa_recoded <- rwa_data_trimmed %>%
       TRUE ~ NA_real_
     ),
     gender = case_when(
-      gender == 1 ~ "Male",
-      gender == 2 ~ "Female",
-      gender == 3 ~ "Other",
+      gender == 1 ~ "1. Male",
+      gender == 2 ~ "2. Female",
+      gender == 3 ~ "3. Other",
       TRUE ~ NA_character_
     ),
     hand = case_when(
-      hand == 1 ~ "Right",
-      hand == 2 ~ "Left",
-      hand == 3 ~ "Both",
+      hand == 1 ~ "1. Right",
+      hand == 2 ~ "2. Left",
+      hand == 3 ~ "3. Both",
       TRUE ~ NA_character_
     ),
     urban = case_when(
-      urban == 1 ~ "Rural",
-      urban == 2 ~ "Suburban",
-      urban == 3 ~ "Urban",
+      urban == 1 ~ "1. Rural",
+      urban == 2 ~ "2. Suburban",
+      urban == 3 ~ "3. Urban",
       TRUE ~ NA_character_
     ),
     family_size = case_when(
@@ -65,13 +65,12 @@ rwa_recoded <- rwa_data_trimmed %>%
       TRUE ~ NA_real_
     ),
     education = case_when(
-      education == 1 ~ "Less than high school",
-      education == 2 ~ "High school",
-      education == 3 ~ "University degree",
-      education == 4 ~ "Graduate degree",
+      education == 1 ~ "1. Less than high school",
+      education == 2 ~ "2. High school",
+      education == 3 ~ "3. University degree",
+      education == 4 ~ "4. Graduate degree",
       TRUE ~ NA_character_
     )
   )
 
-rwa_recoded %>%
-  summarise(across(everything(), ~ sum(is.na(.x))))
+write_csv(rwa_recoded, here("clean_data/rwa_data_cleaned.csv"))
