@@ -9,11 +9,18 @@ dog_survey <- read_csv(here("raw_data/dog_survey.csv"))
 dog_survey_clean <- dog_survey %>%
   select(1:9) %>%
   distinct() %>%
+  clean_names() %>%
+  rename(food_spend = amount_spent_on_dog_food) %>%
   separate_rows(dog_size, dog_gender, dog_age, sep = "and") %>%
   separate_rows(dog_size, dog_gender, dog_age, sep = ",") %>%
   mutate(
-    amount_spent_on_dog_food = as.numeric(
-      str_extract(amount_spent_on_dog_food, "(?<=£)\\d+\\.?\\d*"), digits = 2),
+    email = case_when(
+      str_detect(email, "\\.comm+$") ~ str_replace(email, "\\.comm+$", ".com"),
+      str_detect(email, "@\\w+-*\\w*\\.") ~ email,
+      TRUE ~ NA_character_
+    ),
+    food_spend = as.numeric(
+      str_extract(food_spend, "(?<=£)\\d+\\.?\\d*"), digits = 2),
     dog_size = case_when(
       dog_size == "Smallish" ~ "S",
       dog_size == "Medium sized" ~ "M",
@@ -30,8 +37,7 @@ dog_survey_clean <- dog_survey %>%
     dog_age = as.integer(
       str_extract(dog_age, "\\d+")
     )
-  ) %>%
-  clean_names() %>%
-  rename(food_spend = amount_spent_on_dog_food)
+  )
+
 
 write_csv(dog_survey_clean, here("clean_data/dog_survey_clean.csv"))
