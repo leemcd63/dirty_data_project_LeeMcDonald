@@ -7,7 +7,7 @@ cake_ingredients <- read_csv(here("raw_data/cake-ingredients-1961.csv"))
 cake_ingredient_names <- read_csv(here("raw_data/cake_ingredient_code.csv"))
 
 # Pivot into long format and drop NA values in quantity then clean names
-cake_ingredients_long <- cake_id %>%
+cake_ingredients_long <- cake_ingredients %>%
   pivot_longer(-Cake, names_to = "code", values_to = "quantity") %>%
   drop_na(quantity) %>%
   clean_names()
