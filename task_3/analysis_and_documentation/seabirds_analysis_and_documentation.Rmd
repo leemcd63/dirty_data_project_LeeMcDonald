@@ -13,17 +13,17 @@ seabirds <- read_csv(here("clean_data/seabirds_cleaned.csv"))
 ## 1. Which bird had the most individual sightings?
 ```{r}
 seabirds %>%
-  group_by(species_common_name, species_scientific_name, species_abbreviation) %>%
-  summarise(total_sightings = n_distinct(record_id)) %>%
+  group_by(common_name, scientific_name, abbreviation) %>%
+  summarise(total_sightings = n_distinct(id)) %>%
   ungroup() %>%
-  slice_max(total_sightings)
+  slice_max(total_sightings, n = 1, with_ties = TRUE)
 ```
 Wandering albatross sensu lato PL2	Diomedea antipodensis / exulans PL2 DIOANTEXU PL2	3099
 
 ## 2. Which bird had the highest total count?
 ```{r}
 seabirds %>% 
-  group_by(species_common_name, species_scientific_name, species_abbreviation) %>%
+  group_by(common_name, scientific_name, abbreviation) %>%
   summarise(total_count = sum(count)) %>%
   ungroup() %>%
   slice_max(total_count, n = 1, with_ties = TRUE)
@@ -34,7 +34,7 @@ Short-tailed shearwater	Puffinus tenuirostris	PUFTEN	982553
 ## 3. Which bird had the highest total count above a latitude of -30?
 ```{r}
 seabirds %>%
-  group_by(species_common_name, species_scientific_name, species_abbreviation) %>%
+  group_by(common_name, scientific_name, abbreviation) %>%
   filter(lat > -30) %>%
   summarise(total_count = sum(count)) %>%
   ungroup() %>%
@@ -46,7 +46,7 @@ Wedge-tailed shearwater	Puffinus pacificus	PUFPAC	855
 ## 4. How many different types of birds were only ever seen in groups of 1?
 ```{r}
 seabirds %>%
-  group_by(species_common_name) %>%
+  group_by(common_name) %>%
   summarise(max_group_seen = sum(count) / n_distinct(record_id)) %>%
   filter(max_group_seen == 1) %>%
   ungroup() %>%
@@ -58,8 +58,8 @@ seabirds %>%
 ## 5. How many penguins were seen? (Hint: there are many types of penguin)
 ```{r}
 seabirds %>%
-  filter(str_detect(species_common_name, regex("penguin", ignore_case = TRUE))) %>%
-  summarise(number_of_species = n_distinct(species_common_name),
+  filter(str_detect(common_name, regex("penguin", ignore_case = TRUE))) %>%
+  summarise(number_of_species = n_distinct(common_name),
             total_number_penguins = sum(count))
 ```
 158

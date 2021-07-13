@@ -221,16 +221,18 @@ pre code {
 <pre class="r"><code>seabirds &lt;- read_csv(here(&quot;clean_data/seabirds_cleaned.csv&quot;))
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG7ilIDilIAgQ29sdW1uIHNwZWNpZmljYXRpb24g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5jb2xzKFxuICByZWNvcmRfaWQgPSBjb2xfZG91YmxlKCksXG4gIHNwZWNpZXNfY29tbW9uX25hbWUgPSBjb2xfY2hhcmFjdGVyKCksXG4gIHNwZWNpZXNfc2NpZW50aWZpY19uYW1lID0gY29sX2NoYXJhY3RlcigpLFxuICBzcGVjaWVzX2FiYnJldmlhdGlvbiA9IGNvbF9jaGFyYWN0ZXIoKSxcbiAgY291bnQgPSBjb2xfZG91YmxlKCksXG4gIGxhdCA9IGNvbF9kb3VibGUoKVxuKVxuIn0= -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG7ilIDilIAgQ29sdW1uIHNwZWNpZmljYXRpb24g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5jb2xzKFxuICBpZCA9IGNvbF9kb3VibGUoKSxcbiAgcmVjb3JkX2lkID0gY29sX2RvdWJsZSgpLFxuICBjb21tb25fbmFtZSA9IGNvbF9jaGFyYWN0ZXIoKSxcbiAgc2NpZW50aWZpY19uYW1lID0gY29sX2NoYXJhY3RlcigpLFxuICBhYmJyZXZpYXRpb24gPSBjb2xfY2hhcmFjdGVyKCksXG4gIGNvdW50ID0gY29sX2RvdWJsZSgpLFxuICBsYXQgPSBjb2xfZG91YmxlKCksXG4gIGFnZSA9IGNvbF9jaGFyYWN0ZXIoKVxuKVxuIn0= -->
 <pre><code>
-── Column specification ────────────────────────────────────────────────────────────────────
+── Column specification ────────────────────────────────────────────────────────────────────────────────
 cols(
+  id = col_double(),
   record_id = col_double(),
-  species_common_name = col_character(),
-  species_scientific_name = col_character(),
-  species_abbreviation = col_character(),
+  common_name = col_character(),
+  scientific_name = col_character(),
+  abbreviation = col_character(),
   count = col_double(),
-  lat = col_double()
+  lat = col_double(),
+  age = col_character()
 )</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
@@ -239,21 +241,21 @@ cols(
 <h2>1. Which bird had the most individual sightings?</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VhYmlyZHMgJT4lXG4gIGdyb3VwX2J5KHNwZWNpZXNfY29tbW9uX25hbWUsIHNwZWNpZXNfc2NpZW50aWZpY19uYW1lLCBzcGVjaWVzX2FiYnJldmlhdGlvbikgJT4lXG4gIHN1bW1hcmlzZSh0b3RhbF9zaWdodGluZ3MgPSBuX2Rpc3RpbmN0KHJlY29yZF9pZCkpICU+JVxuICB1bmdyb3VwKCkgJT4lXG4gIHNsaWNlX21heCh0b3RhbF9zaWdodGluZ3MpXG5cbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VhYmlyZHMgJT4lXG4gIGdyb3VwX2J5KGNvbW1vbl9uYW1lLCBzY2llbnRpZmljX25hbWUsIGFiYnJldmlhdGlvbikgJT4lXG4gIHN1bW1hcmlzZSh0b3RhbF9zaWdodGluZ3MgPSBuX2Rpc3RpbmN0KGlkKSkgJT4lXG4gIHVuZ3JvdXAoKSAlPiVcbiAgc2xpY2VfbWF4KHRvdGFsX3NpZ2h0aW5ncywgbiA9IDEsIHdpdGhfdGllcyA9IFRSVUUpXG5cbmBgYCJ9 -->
 <pre class="r"><code>seabirds %&gt;%
-  group_by(species_common_name, species_scientific_name, species_abbreviation) %&gt;%
-  summarise(total_sightings = n_distinct(record_id)) %&gt;%
+  group_by(common_name, scientific_name, abbreviation) %&gt;%
+  summarise(total_sightings = n_distinct(id)) %&gt;%
   ungroup() %&gt;%
-  slice_max(total_sightings)
+  slice_max(total_sightings, n = 1, with_ties = TRUE)
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiYHN1bW1hcmlzZSgpYCBoYXMgZ3JvdXBlZCBvdXRwdXQgYnkgJ3NwZWNpZXNfY29tbW9uX25hbWUnLCAnc3BlY2llc19zY2llbnRpZmljX25hbWUnLiBZb3UgY2FuIG92ZXJyaWRlIHVzaW5nIHRoZSBgLmdyb3Vwc2AgYXJndW1lbnQuXG4ifQ== -->
-<pre><code>`summarise()` has grouped output by &#39;species_common_name&#39;, &#39;species_scientific_name&#39;. You can override using the `.groups` argument.</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiYHN1bW1hcmlzZSgpYCBoYXMgZ3JvdXBlZCBvdXRwdXQgYnkgJ2NvbW1vbl9uYW1lJywgJ3NjaWVudGlmaWNfbmFtZScuIFlvdSBjYW4gb3ZlcnJpZGUgdXNpbmcgdGhlIGAuZ3JvdXBzYCBhcmd1bWVudC5cbiJ9 -->
+<pre><code>`summarise()` has grouped output by &#39;common_name&#39;, &#39;scientific_name&#39;. You can override using the `.groups` argument.</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6NCwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIHggNCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUEyMVNRVXZETUJUT2FxdHNPQlVtZVBBUzlMd0s4NkJYWVFxQ3FNaUd1NDNYTnR1Q2FWS2FWSGYwbDIrK2RBbU1ZQ0N2TCsvTGwzemZTei9Hczl2ZXJFY0lPU0J4QjJPQ0tVbW1rNmZoUFNGeGhJc09pVW5YZnRjSUR6Q0pjWjd0QVZlZklBdFdjN21rSURJd3RkS2FhaVoxUXdVWVJkOWZSZ0hqZXN4VnlRb0dGS1RobFNwd005ZjBockoxSTBEcWZ5ajk4ZlBidyt2a2NUWjFZTDhGeWZGbElET1JVREx0MkxFckRuVEZjczcwUEZkbHFlVGM3bkhRaFljMFJsU3o0UGsrZk81aHlMS2FmWE13WEVtSG5ScGxRTXcxWDY0TXV0ZUJrbTZ0ZmxLdnhzcU5makZzY1lTU2N3RmFCNFo3QlJoSUY3V1ZRc2dtb0J5cHlncEJVbVNmSkFuSW5Ub29uRFhTS2ltRythcVJYOFBSbmIxaDE4RjJ1RzYyMCtmeDdzNW82ODVLM0ZtSFRDNjU5QTFLQkdSTXVNVUpXbTRkcHhYK0Q4WmJ3YXBPMjJiNVNxNkVyN1RteU9ZUHBhelBlNG9DQUFBPSJ9 -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6NCwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIHggNCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUEyVlJUVS9ETUF6MVNndGErUmpTZmdDOW81VURRdUtLVkpDNERBbHRvcmZKYmJNdElrMm1Kb1VkK2NmOGd3Mm5hNlFwUkVwaVA5dng4OHQ3bHQvSGVRd0FKeEFPNkl6SWhHZytlNWs4QW9RQk9RTUlZV2p2TFlYSFpJUzByNDhDNHcrVUZXdTRYQ1VvQ2pTTjB0cEx1Y200cWxuRk1FRnArRVpWVEdxdWs3dUViVnVCMGs4ZlpxOXZUOVBaY3o0bjU3SUx3TzJ2eHllU1dETlhHZmJnZWFucVdzbUZqZlhRU0plY1VkY2xMNC9oQ3l5S2huMXhORnhKbDJxVVFiSFFmTFUyTkk3Mk9nNGI5WjI2cnBaVzhFUEhucFpQclJUNFQ0TzRRb1Bwc3JFVUFIWmV5Wm5hV0NKVUZGaU5JNjk0MEhqQXFKV1dTVFVwMTYzOG5EellCZ2VodXRXTDFtMW5oNGVXd2I1L0t1cWZPbVZ5eGFYVEpSSllNTkU3VnpSeE4zQzZvZjgxYmhKQ2RkcHA1WkJTQ1lkMHM4SHVEOG8xc3BSYUFnQUEifQ== -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["species_common_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["species_scientific_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["species_abbreviation"],"name":[3],"type":["chr"],"align":["left"]},{"label":["total_sightings"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"Wandering albatross sensu lato PL2","2":"Diomedea antipodensis / exulans PL2","3":"DIOANTEXU PL2","4":"3099"}],"options":{"columns":{"min":{},"max":[10],"total":[4]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
+{"columns":[{"label":["common_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["scientific_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["abbreviation"],"name":[3],"type":["chr"],"align":["left"]},{"label":["total_sightings"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"Wandering albatross","2":"Diomedea antipodensis / exulans","3":"DIOANTEXU","4":"11247"}],"options":{"columns":{"min":{},"max":[10],"total":[4]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -265,21 +267,21 @@ cols(
 <h2>2. Which bird had the highest total count?</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VhYmlyZHMgJT4lIFxuICBncm91cF9ieShzcGVjaWVzX2NvbW1vbl9uYW1lLCBzcGVjaWVzX3NjaWVudGlmaWNfbmFtZSwgc3BlY2llc19hYmJyZXZpYXRpb24pICU+JVxuICBzdW1tYXJpc2UodG90YWxfY291bnQgPSBzdW0oY291bnQpKSAlPiVcbiAgdW5ncm91cCgpICU+JVxuICBzbGljZV9tYXgodG90YWxfY291bnQsIG4gPSAxLCB3aXRoX3RpZXMgPSBUUlVFKVxuXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VhYmlyZHMgJT4lIFxuICBncm91cF9ieShjb21tb25fbmFtZSwgc2NpZW50aWZpY19uYW1lLCBhYmJyZXZpYXRpb24pICU+JVxuICBzdW1tYXJpc2UodG90YWxfY291bnQgPSBzdW0oY291bnQpKSAlPiVcbiAgdW5ncm91cCgpICU+JVxuICBzbGljZV9tYXgodG90YWxfY291bnQsIG4gPSAxLCB3aXRoX3RpZXMgPSBUUlVFKVxuXG5gYGAifQ== -->
 <pre class="r"><code>seabirds %&gt;% 
-  group_by(species_common_name, species_scientific_name, species_abbreviation) %&gt;%
+  group_by(common_name, scientific_name, abbreviation) %&gt;%
   summarise(total_count = sum(count)) %&gt;%
   ungroup() %&gt;%
   slice_max(total_count, n = 1, with_ties = TRUE)
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiYHN1bW1hcmlzZSgpYCBoYXMgZ3JvdXBlZCBvdXRwdXQgYnkgJ3NwZWNpZXNfY29tbW9uX25hbWUnLCAnc3BlY2llc19zY2llbnRpZmljX25hbWUnLiBZb3UgY2FuIG92ZXJyaWRlIHVzaW5nIHRoZSBgLmdyb3Vwc2AgYXJndW1lbnQuXG4ifQ== -->
-<pre><code>`summarise()` has grouped output by &#39;species_common_name&#39;, &#39;species_scientific_name&#39;. You can override using the `.groups` argument.</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiYHN1bW1hcmlzZSgpYCBoYXMgZ3JvdXBlZCBvdXRwdXQgYnkgJ2NvbW1vbl9uYW1lJywgJ3NjaWVudGlmaWNfbmFtZScuIFlvdSBjYW4gb3ZlcnJpZGUgdXNpbmcgdGhlIGAuZ3JvdXBzYCBhcmd1bWVudC5cbiJ9 -->
+<pre><code>`summarise()` has grouped output by &#39;common_name&#39;, &#39;scientific_name&#39;. You can override using the `.groups` argument.</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6NCwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIHggNCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUExMVJ3VTdETUF4MVN3dGEwYVpKQTNIZEQ3UUhldUdLQkR1aWlXM1NibFBhcGpTaVRhb2taUno1Y0xUaGRJMVVZaW1PNDJjbjd6bnZML3MwMmtjQWNBV0JoejdFRU1MZGRoVS9BUVErSGp3SVlHTDJiNFFYR0FTNDVpUGdZVk1KcVdOTldFMkxwYW9va1VlaXFYVEs3dGRkV1RMZXFhV212R05TS0MyWmNvcXUxN3ZWOXZVTm81bkpQc2UvajlEYlB5b2hKdzIxcmNHUVhLaVc1b3lxUXk2YVJ2Q0RxYkVNTGFUUWM4MUtsby9oT3d1VExKUDBpeEhOQkIrd1d5MDBxZkhPam11SHhVU0tZMktaVEhINVArak9hQzdkdkNiS1ZSb1ZSSk9rbElZR3dNbHB1Ukd0SVlGTnZobDU2RFI3N25EbkhUZE1paml2T3Y0WnA2bDVvY2N2TmgxaWJ4UUhsemY5ODNCWGFQK0E4Zy9HN1hEQ21tUzBIZzR6bE53clRsckpjQ0NERk15cXBCK1V6ZVNpdHBsZUhKeitBTzdIUE54cUFnQUEifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6NCwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIHggNCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUExMVFVVXZETUJDKzFsWlpkWnNnNHV2K1FQdWdJTDRLdWtjWnVzSGVScHFtTnRnbUkwbWRqLzV3MlhicEdxZzVTUExsdTF5K3UrLzlaZjJRckJNQU9JTW93RDFHQ1BGcU9VK2ZBS0lRTHdGRU1MTG5ENlp2RUVTNHJnZUp1NDlLS3BNYXdtdFd6SFRGaU5vUnc1VDM3SGJSbGlVWHJaNFpKbHF1cERhS2ErL1IrV0kxWDc2K0lacFk5am45dTRjdS9yVVNDOUl3VnhyMTVDV1ZUU1BGeHVaNmFxb3BaOEx3a3RNaGZVWHlYTEZ2VGd5WHdsVWJhVWk5b2JJVnhsTWJLYm5Mbk9JWVYvaUwyd0hEYjR2V1JQc1RKUVV4SkN1VmxRZllleVVYY211YndLTFFXaHQ3eFlGdjRyUVZ0cE1pcFZVcnZ0SkhLOUNsVHpIdWNUREEwVWt5UFBSZnhjNXFKajY1Y0o3RU5jbFozVjhtT0hFM2NMWlZIUDNvSjBGV1o1MVBqcUd5ZGt3M0creVBRbTBydmxFQ0FBQT0ifQ== -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["species_common_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["species_scientific_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["species_abbreviation"],"name":[3],"type":["chr"],"align":["left"]},{"label":["total_count"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"Short-tailed shearwater","2":"Puffinus tenuirostris","3":"PUFTEN","4":"982553"}],"options":{"columns":{"min":{},"max":[10],"total":[4]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
+{"columns":[{"label":["common_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["scientific_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["abbreviation"],"name":[3],"type":["chr"],"align":["left"]},{"label":["total_count"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"Short-tailed shearwater","2":"Puffinus tenuirostris","3":"PUFTEN","4":"982553"}],"options":{"columns":{"min":{},"max":[10],"total":[4]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -291,22 +293,22 @@ cols(
 <h2>3. Which bird had the highest total count above a latitude of -30?</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VhYmlyZHMgJT4lXG4gIGdyb3VwX2J5KHNwZWNpZXNfY29tbW9uX25hbWUsIHNwZWNpZXNfc2NpZW50aWZpY19uYW1lLCBzcGVjaWVzX2FiYnJldmlhdGlvbikgJT4lXG4gIGZpbHRlcihsYXQgPiAtMzApICU+JVxuICBzdW1tYXJpc2UodG90YWxfY291bnQgPSBzdW0oY291bnQpKSAlPiVcbiAgdW5ncm91cCgpICU+JVxuICBzbGljZV9tYXgodG90YWxfY291bnQsIG4gPSAxLCB3aXRoX3RpZXMgPSBUUlVFKVxuXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VhYmlyZHMgJT4lXG4gIGdyb3VwX2J5KGNvbW1vbl9uYW1lLCBzY2llbnRpZmljX25hbWUsIGFiYnJldmlhdGlvbikgJT4lXG4gIGZpbHRlcihsYXQgPiAtMzApICU+JVxuICBzdW1tYXJpc2UodG90YWxfY291bnQgPSBzdW0oY291bnQpKSAlPiVcbiAgdW5ncm91cCgpICU+JVxuICBzbGljZV9tYXgodG90YWxfY291bnQsIG4gPSAxLCB3aXRoX3RpZXMgPSBUUlVFKVxuXG5gYGAifQ== -->
 <pre class="r"><code>seabirds %&gt;%
-  group_by(species_common_name, species_scientific_name, species_abbreviation) %&gt;%
+  group_by(common_name, scientific_name, abbreviation) %&gt;%
   filter(lat &gt; -30) %&gt;%
   summarise(total_count = sum(count)) %&gt;%
   ungroup() %&gt;%
   slice_max(total_count, n = 1, with_ties = TRUE)
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiYHN1bW1hcmlzZSgpYCBoYXMgZ3JvdXBlZCBvdXRwdXQgYnkgJ3NwZWNpZXNfY29tbW9uX25hbWUnLCAnc3BlY2llc19zY2llbnRpZmljX25hbWUnLiBZb3UgY2FuIG92ZXJyaWRlIHVzaW5nIHRoZSBgLmdyb3Vwc2AgYXJndW1lbnQuXG4ifQ== -->
-<pre><code>`summarise()` has grouped output by &#39;species_common_name&#39;, &#39;species_scientific_name&#39;. You can override using the `.groups` argument.</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiYHN1bW1hcmlzZSgpYCBoYXMgZ3JvdXBlZCBvdXRwdXQgYnkgJ2NvbW1vbl9uYW1lJywgJ3NjaWVudGlmaWNfbmFtZScuIFlvdSBjYW4gb3ZlcnJpZGUgdXNpbmcgdGhlIGAuZ3JvdXBzYCBhcmd1bWVudC5cbiJ9 -->
+<pre><code>`summarise()` has grouped output by &#39;common_name&#39;, &#39;scientific_name&#39;. You can override using the `.groups` argument.</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6NCwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIHggNCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUExMVJ3VTdETUF4MVN3dGEwYWFKSVhIZEQ3UkNnZ05IRUdqbkNqR3gyNVNtNlJiUkpsV1RNbzZjK1NLK2JzTnBHNm5FVWx6SHo0NmZYMTlmTm5mUkpnS0FNd2c4OUNHR0VLN2ZWdkVEUU9EanhZTUFKdWI3aGZBQ2d3RFBmQVRjdkxOOHgySk5lTW55cGRvejBoeUlabzFUZHBXMlJjRkZxNVkxb2J6Z3RGVk94WG02WHFWUHp4ak5UUGJ4NXhkNis4Y2pGS1JpdGpVWWtndFZNOHFaMmxKWlZWSnNUWTJsWnlHRlhtZ3plUXhmVzVoa1djTStPZEZjaWdHNzFGS1RFdDlzaFhaWVRCcDVTQ3lUS1I3L0c5MEp6YVZMUzZMY1RhT2NhSklVamFFQmNIUmFMbVJ0U0dDVGIvUU9uV2JQVlhiZUNzTWtqK20rRlIveC9hMlowT0c5VFlmWUc4VkJQOU0vRFcrRjloOHdzZVBDaWhPV0pHUGxjSm5oeXQzR1NkMXdGR1JZQmJNcTZZU3lHU3BMbSttV2crTWYyN3hjdW1jQ0FBQT0ifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6NCwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIHggNCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUExMVFzVTdETUJDOWhBVFVRRnNFQTJ0L0lGa1lZQVNCT2tjVkZkMHF4M0ZhaThTT0Vwc3lNdk5GZkYzTE9ZbWw0Sk5zUDcveitkMjkxZXZtUHRwRUFIQUdnWWQ3aUJEQzlkc3lmZ1FJZkx4NEVNREVuRitZdmtVUTRMb2VKZTdlV2I1anNTSzhaUG1pM1RQU0hJaGlqZlBzSnRWRndZVnVGeldodk9CVXQ4Nkw4M1M5VEo5ZkVNME0rL1R6QzMzODZ5TVVwR0syTkJqSVN5cXJTb3F0eVEzVXZLV2NDV1dVeHZRVnliS0dmWEtpdUJTMldrbEZ5aTJWV2loSGJkTElRMklWcDdqOGI5eE9HRzVidENTdE8xR1VFMFdTb2pIeUFFZW41RUxXcGdrczhvMnZvVlBzdVE3T3RUQ2Q1REhkYS9FUlB4aUJMdDNIZE1EZUNBZTlwSDhhdmdxdDFVenN1TENlaENYSldEbGNaamh4TjNCU054ejlHQ1pCdGswNm55eERaV21aYmpZNC9nRnd5cWMzVGdJQUFBPT0ifQ== -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["species_common_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["species_scientific_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["species_abbreviation"],"name":[3],"type":["chr"],"align":["left"]},{"label":["total_count"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"Wedge-tailed shearwater","2":"Puffinus pacificus","3":"PUFPAC","4":"855"}],"options":{"columns":{"min":{},"max":[10],"total":[4]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
+{"columns":[{"label":["common_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["scientific_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["abbreviation"],"name":[3],"type":["chr"],"align":["left"]},{"label":["total_count"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"Wedge-tailed shearwater","2":"Puffinus pacificus","3":"PUFPAC","4":"855"}],"options":{"columns":{"min":{},"max":[10],"total":[4]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -318,10 +320,10 @@ cols(
 <h2>4. How many different types of birds were only ever seen in groups of 1?</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6MSwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIHggMSJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUExMVB3UXJDTUF6TjVxcHM0QlQ4anUyaWdrY1A0Z2VJZ2plcHMrcXd0cVByVUc5K3Vack9GclNCdE1scjMwdmVhckVkSjlzRUFEb1FCWGdTTElGczFzdHNCaENGMkFRUVFXenVPejZQV2dBZ05mZDg4NFJ2L0gwa2dsNVpqY1h3Qnh5Y2xHeXFlaWNGdytRUGp4TXJlY3NkcjQ4Wkd1azNoaTllY0ZyNzRzbUJhcG9mRmZLeGUzbVVucXgwS1FXU1FyTSs4Y2lCOG9CaEk4d21oNnc0TitLU1RhWm1ndlVOZHIzQTVrOXRab1p2cTBXc1ZwZUpVeW1ZVzU3VFBlTzJTZEZ5NnppdlZDbTBzNEpvbld1cHFmdVhGSkk3cERVSHJ3Ly9YUmVRdGdFQUFBPT0ifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6MSwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIHggMSJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUExMVB3UXJDTUF6TjVxcHM0QlQ4amczVWd4NDlpQjhnQ3Q2a3pxckQybzZ1UTczNTVXbzZXdEFHMGlTdmVVbmVlcm1iSnJzRUFEb1FCZmdTVElGc042dHNEaENGV0FRUVFXemlBNzlITFFDUW1yaVlnYlcvUmlMb2pkV1lESC9Bd1ZuSnBxcjNVakIwL3ZRNHNaTDMzUEg2Nk9FTG53K2FQN3pndFBhSEowZXFhWDVTeU1mcTdWRjZzdEtsRkVnS3pmbkVJd2ZLQTRhTk1KY2NzK0xTaUdzMm5wZ05WamZZOHdMclA3blpHWDdzTEdKbmRaazRsNEs1NHprOU1HNkxGQ1czaXZOS2xVSTdLWWpXdVphYXVyNmtrTndoclRoNGZ3SDRNbVk5dGdFQUFBPT0ifQ== -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["groups_one_only"],"name":[1],"type":["dbl"],"align":["right"]}],"data":[{"1":"86"}],"options":{"columns":{"min":{},"max":[10],"total":[1]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
+{"columns":[{"label":["groups_one_only"],"name":[1],"type":["dbl"],"align":["right"]}],"data":[{"1":"23"}],"options":{"columns":{"min":{},"max":[10],"total":[1]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -333,10 +335,10 @@ cols(
 <h2>5. How many penguins were seen? (Hint: there are many types of penguin)</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6Miwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIHggMiJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUExMVF3VTRESVJDZHBZdW1tN1NwTVg3RzdzVVlQWHBvL0FDalNXOGJTcW1TVXRnQUd6MzZhWDVaNjhCQ1V1RUFiOTd3WnViTjYzcHozMndhQUpoQlhlRk5FUUo5ZjN0cG53QnFna0VGTmN6RCs0M3BXd1NCWE1RRXhNUXk0R2YrQzlQNUo2S2FIWVZEc0lyQ2lielI0M0VyYkcvMnZSc0VsL2hoU3R4NTQ1bnFVM29RK21PVTJoVWw1OVo4ZGJsc21JUDg0SFhHVS9ibWlybmNPNVBOam5uVzdTM3FNVG9Wa21zemVHbENTeEtjMGtKYzJZSllqVHBNc212NTU2Z1A3Y05qNkpCV0F4ZHJxaTR3bVhxU2M2cEZVNjBydEN1MXlNTXJ0aFVxQlV1MEhCMTNnNVhhWnl2SXVpNnVMRFBjcU14RWMzRDZBOTZLRXduaEFRQUEifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6Miwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIHggMiJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUExMVF3VW9ETVJDZGpSdExGeXdWOFROMlFVVHc2RUg4QUtuUTI1S21xUWJUWkVteTZORlA4OHZhVHJJSnRBbHM5czJidkpsNTgvNjZmbXpXRFFCY1FWM2hUUkVDL1ZpOXRjOEFOY0dnZ2hybTRmK0w2VHNFZ2J5SkNZQVpmb3VBWC9nL1RPZENSRFhiQzRkZ0dZVVRlYXZIL1ViWTN1eDZOd2d1OGNHVXVQZkdNOVduOUNEMDV5aTFLMHJPcmZucGN0a3dCL25ENjRpbjdNMFZjN2wzSnBzdDg2emJXZFJqZENna016TjRhVUpMRXB6U1FselpnbGlPT2t5eWJmblhxTC9iaDZmUUlhMEd6dFpVbldFeTlTVEhWSXVtV3Rkb1YycVJoMWRzSTFRS0ZtZzVPdTRHSzdYUFZwQjFYVnhaWnJoUm1Zbm00SEFDNXE3QTVlRUJBQUE9In0= -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["number_of_species"],"name":[1],"type":["int"],"align":["right"]},{"label":["total_number_penguins"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"9","2":"158"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
+{"columns":[{"label":["number_of_species"],"name":[1],"type":["int"],"align":["right"]},{"label":["total_number_penguins"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"7","2":"158"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -346,7 +348,7 @@ cols(
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiVGFzayAzIC0gU2VhYmlyZHMiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCmBgYHtyfQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShoZXJlKQoKc2VhYmlyZHMgPC0gcmVhZF9jc3YoaGVyZSgiY2xlYW5fZGF0YS9zZWFiaXJkc19jbGVhbmVkLmNzdiIpKQpgYGAKCiMjIDEuIFdoaWNoIGJpcmQgaGFkIHRoZSBtb3N0IGluZGl2aWR1YWwgc2lnaHRpbmdzPwpgYGB7cn0Kc2VhYmlyZHMgJT4lCiAgZ3JvdXBfYnkoc3BlY2llc19jb21tb25fbmFtZSwgc3BlY2llc19zY2llbnRpZmljX25hbWUsIHNwZWNpZXNfYWJicmV2aWF0aW9uKSAlPiUKICBzdW1tYXJpc2UodG90YWxfc2lnaHRpbmdzID0gbl9kaXN0aW5jdChyZWNvcmRfaWQpKSAlPiUKICB1bmdyb3VwKCkgJT4lCiAgc2xpY2VfbWF4KHRvdGFsX3NpZ2h0aW5ncykKYGBgCldhbmRlcmluZyBhbGJhdHJvc3Mgc2Vuc3UgbGF0byBQTDIJRGlvbWVkZWEgYW50aXBvZGVuc2lzIC8gZXh1bGFucyBQTDIgRElPQU5URVhVIFBMMgkzMDk5CgojIyAyLiBXaGljaCBiaXJkIGhhZCB0aGUgaGlnaGVzdCB0b3RhbCBjb3VudD8KYGBge3J9CnNlYWJpcmRzICU+JSAKICBncm91cF9ieShzcGVjaWVzX2NvbW1vbl9uYW1lLCBzcGVjaWVzX3NjaWVudGlmaWNfbmFtZSwgc3BlY2llc19hYmJyZXZpYXRpb24pICU+JQogIHN1bW1hcmlzZSh0b3RhbF9jb3VudCA9IHN1bShjb3VudCkpICU+JQogIHVuZ3JvdXAoKSAlPiUKICBzbGljZV9tYXgodG90YWxfY291bnQsIG4gPSAxLCB3aXRoX3RpZXMgPSBUUlVFKQpgYGAKU2hvcnQtdGFpbGVkIHNoZWFyd2F0ZXIJUHVmZmludXMgdGVudWlyb3N0cmlzCVBVRlRFTgk5ODI1NTMKCgojIyAzLiBXaGljaCBiaXJkIGhhZCB0aGUgaGlnaGVzdCB0b3RhbCBjb3VudCBhYm92ZSBhIGxhdGl0dWRlIG9mIC0zMD8KYGBge3J9CnNlYWJpcmRzICU+JQogIGdyb3VwX2J5KHNwZWNpZXNfY29tbW9uX25hbWUsIHNwZWNpZXNfc2NpZW50aWZpY19uYW1lLCBzcGVjaWVzX2FiYnJldmlhdGlvbikgJT4lCiAgZmlsdGVyKGxhdCA+IC0zMCkgJT4lCiAgc3VtbWFyaXNlKHRvdGFsX2NvdW50ID0gc3VtKGNvdW50KSkgJT4lCiAgdW5ncm91cCgpICU+JQogIHNsaWNlX21heCh0b3RhbF9jb3VudCwgbiA9IDEsIHdpdGhfdGllcyA9IFRSVUUpCmBgYApXZWRnZS10YWlsZWQgc2hlYXJ3YXRlcglQdWZmaW51cyBwYWNpZmljdXMJUFVGUEFDCTg1NQoKCiMjIDQuIEhvdyBtYW55IGRpZmZlcmVudCB0eXBlcyBvZiBiaXJkcyB3ZXJlIG9ubHkgZXZlciBzZWVuIGluIGdyb3VwcyBvZiAxPwpgYGB7cn0Kc2VhYmlyZHMgJT4lCiAgZ3JvdXBfYnkoc3BlY2llc19jb21tb25fbmFtZSkgJT4lCiAgc3VtbWFyaXNlKG1heF9ncm91cF9zZWVuID0gc3VtKGNvdW50KSAvIG5fZGlzdGluY3QocmVjb3JkX2lkKSkgJT4lCiAgZmlsdGVyKG1heF9ncm91cF9zZWVuID09IDEpICU+JQogIHVuZ3JvdXAoKSAlPiUKICBzdW1tYXJpc2UoZ3JvdXBzX29uZV9vbmx5ID0gc3VtKG1heF9ncm91cF9zZWVuKSkKYGBgCjg2IGluIGdyb3VwcyBvZiBvbmUgb25seQoKCiMjIDUuIEhvdyBtYW55IHBlbmd1aW5zIHdlcmUgc2Vlbj8gKEhpbnQ6IHRoZXJlIGFyZSBtYW55IHR5cGVzIG9mIHBlbmd1aW4pCmBgYHtyfQpzZWFiaXJkcyAlPiUKICBmaWx0ZXIoc3RyX2RldGVjdChzcGVjaWVzX2NvbW1vbl9uYW1lLCByZWdleCgicGVuZ3VpbiIsIGlnbm9yZV9jYXNlID0gVFJVRSkpKSAlPiUKICBzdW1tYXJpc2UobnVtYmVyX29mX3NwZWNpZXMgPSBuX2Rpc3RpbmN0KHNwZWNpZXNfY29tbW9uX25hbWUpLAogICAgICAgICAgICB0b3RhbF9udW1iZXJfcGVuZ3VpbnMgPSBzdW0oY291bnQpKQpgYGAKMTU4Cg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiVGFzayAzIC0gU2VhYmlyZHMiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCmBgYHtyfQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShoZXJlKQoKc2VhYmlyZHMgPC0gcmVhZF9jc3YoaGVyZSgiY2xlYW5fZGF0YS9zZWFiaXJkc19jbGVhbmVkLmNzdiIpKQpgYGAKCiMjIDEuIFdoaWNoIGJpcmQgaGFkIHRoZSBtb3N0IGluZGl2aWR1YWwgc2lnaHRpbmdzPwpgYGB7cn0Kc2VhYmlyZHMgJT4lCiAgZ3JvdXBfYnkoY29tbW9uX25hbWUsIHNjaWVudGlmaWNfbmFtZSwgYWJicmV2aWF0aW9uKSAlPiUKICBzdW1tYXJpc2UodG90YWxfc2lnaHRpbmdzID0gbl9kaXN0aW5jdChpZCkpICU+JQogIHVuZ3JvdXAoKSAlPiUKICBzbGljZV9tYXgodG90YWxfc2lnaHRpbmdzLCBuID0gMSwgd2l0aF90aWVzID0gVFJVRSkKYGBgCldhbmRlcmluZyBhbGJhdHJvc3Mgc2Vuc3UgbGF0byBQTDIJRGlvbWVkZWEgYW50aXBvZGVuc2lzIC8gZXh1bGFucyBQTDIgRElPQU5URVhVIFBMMgkzMDk5CgojIyAyLiBXaGljaCBiaXJkIGhhZCB0aGUgaGlnaGVzdCB0b3RhbCBjb3VudD8KYGBge3J9CnNlYWJpcmRzICU+JSAKICBncm91cF9ieShjb21tb25fbmFtZSwgc2NpZW50aWZpY19uYW1lLCBhYmJyZXZpYXRpb24pICU+JQogIHN1bW1hcmlzZSh0b3RhbF9jb3VudCA9IHN1bShjb3VudCkpICU+JQogIHVuZ3JvdXAoKSAlPiUKICBzbGljZV9tYXgodG90YWxfY291bnQsIG4gPSAxLCB3aXRoX3RpZXMgPSBUUlVFKQpgYGAKU2hvcnQtdGFpbGVkIHNoZWFyd2F0ZXIJUHVmZmludXMgdGVudWlyb3N0cmlzCVBVRlRFTgk5ODI1NTMKCgojIyAzLiBXaGljaCBiaXJkIGhhZCB0aGUgaGlnaGVzdCB0b3RhbCBjb3VudCBhYm92ZSBhIGxhdGl0dWRlIG9mIC0zMD8KYGBge3J9CnNlYWJpcmRzICU+JQogIGdyb3VwX2J5KGNvbW1vbl9uYW1lLCBzY2llbnRpZmljX25hbWUsIGFiYnJldmlhdGlvbikgJT4lCiAgZmlsdGVyKGxhdCA+IC0zMCkgJT4lCiAgc3VtbWFyaXNlKHRvdGFsX2NvdW50ID0gc3VtKGNvdW50KSkgJT4lCiAgdW5ncm91cCgpICU+JQogIHNsaWNlX21heCh0b3RhbF9jb3VudCwgbiA9IDEsIHdpdGhfdGllcyA9IFRSVUUpCmBgYApXZWRnZS10YWlsZWQgc2hlYXJ3YXRlcglQdWZmaW51cyBwYWNpZmljdXMJUFVGUEFDCTg1NQoKCiMjIDQuIEhvdyBtYW55IGRpZmZlcmVudCB0eXBlcyBvZiBiaXJkcyB3ZXJlIG9ubHkgZXZlciBzZWVuIGluIGdyb3VwcyBvZiAxPwpgYGB7cn0Kc2VhYmlyZHMgJT4lCiAgZ3JvdXBfYnkoY29tbW9uX25hbWUpICU+JQogIHN1bW1hcmlzZShtYXhfZ3JvdXBfc2VlbiA9IHN1bShjb3VudCkgLyBuX2Rpc3RpbmN0KHJlY29yZF9pZCkpICU+JQogIGZpbHRlcihtYXhfZ3JvdXBfc2VlbiA9PSAxKSAlPiUKICB1bmdyb3VwKCkgJT4lCiAgc3VtbWFyaXNlKGdyb3Vwc19vbmVfb25seSA9IHN1bShtYXhfZ3JvdXBfc2VlbikpCmBgYAo4NiBpbiBncm91cHMgb2Ygb25lIG9ubHkKCgojIyA1LiBIb3cgbWFueSBwZW5ndWlucyB3ZXJlIHNlZW4/IChIaW50OiB0aGVyZSBhcmUgbWFueSB0eXBlcyBvZiBwZW5ndWluKQpgYGB7cn0Kc2VhYmlyZHMgJT4lCiAgZmlsdGVyKHN0cl9kZXRlY3QoY29tbW9uX25hbWUsIHJlZ2V4KCJwZW5ndWluIiwgaWdub3JlX2Nhc2UgPSBUUlVFKSkpICU+JQogIHN1bW1hcmlzZShudW1iZXJfb2Zfc3BlY2llcyA9IG5fZGlzdGluY3QoY29tbW9uX25hbWUpLAogICAgICAgICAgICB0b3RhbF9udW1iZXJfcGVuZ3VpbnMgPSBzdW0oY291bnQpKQpgYGAKMTU4Cg==</div>
 
 
 

@@ -3,12 +3,12 @@ library(janitor)
 library(here)
 library(readxl)
 
-# Read in dirty data
+# Read in dirty data ----
 candy_data_2015 <- read_xlsx(here("raw_data/boing-boing-candy-2015.xlsx"))
 candy_data_2016 <- read_xlsx(here("raw_data/boing-boing-candy-2016.xlsx"))
 candy_data_2017 <- read_xlsx(here("raw_data/boing-boing-candy-2017.xlsx"))
 
-# Create function to check if column contains rating
+# Create function to check if column contains rating ----
 is_rating <- function(col) {
   ratings <- list("JOY", "MEH", "DESPAIR")
   for (x in ratings) {
@@ -19,7 +19,7 @@ is_rating <- function(col) {
   }
 }
 
-# Cleaning 2015 data
+# Cleaning 2015 data ----
 
 candy_2015_trimmed <- candy_data_2015 %>%
   # rename age and trick or treat columns
@@ -38,7 +38,7 @@ candy_2015_trimmed <- candy_data_2015 %>%
          trick_or_treat,
          starts_with("["))
          #where(~is_rating(.x)),
-         #-starts_with("Please"))
+          #-starts_with("Please"))
 
 candy_2015_long <- candy_2015_trimmed %>%
   # convert to long format
@@ -50,9 +50,8 @@ candy_2015_long <- candy_2015_trimmed %>%
   # remove brackets from candy names
   mutate(candy_name = str_sub(candy_name, 2, -2))
   
-# Cleaning 2016 data
-
-candy_2016_trimmed <- candy_data_2016 %>%
+# Cleaning 2016 data ----
+candy_2016_trimmed <- candy_data_2016 %>% 
   # rename trick or treat, age, gender and country columns
   rename("trick_or_treat" = 2,
          "gender" = 3,
@@ -84,7 +83,8 @@ candy_2016_long <- candy_2016_trimmed %>%
   # remove brackets from candy names
   mutate(candy_name = str_sub(candy_name, 2, -2))
 
-# Cleaning 2017 data
+# Cleaning 2017 data ----
+
 candy_2017_trimmed <- candy_data_2017 %>%
   # rename trick or treat, age, gender and country columns
   rename("trick_or_treat" = 2,
@@ -116,37 +116,36 @@ candy_2017_long <- candy_2017_trimmed %>%
   # remove "brackets"Q6 |" from candy names
   mutate(candy_name = str_sub(candy_name, 6))
 
-
-# Join tables
+# Join tables ----
 candy_data_complete <- candy_2015_long %>%
   full_join(candy_2016_long) %>%
   full_join(candy_2017_long)
 
-# Check distinct country names
+# Check distinct country names ----
 distinct_countries <- candy_data_complete %>%
   distinct(country) %>%
   arrange(country)
 
-# Create regex strings for recoding
-usa_string <- "u.s.|us|u s|amer|states|united s|rica|murrika|new y|cali|alaska|trump|pittsburgh|carolina|cascadia|yoo ess|jersey"
-uk_string <- "uk|united k|england|endland|scotland"
-na_string <- "0|one|never|some|god|of|^a$|see|eua|denial|insanity|know|atlantis|fear|narnia|earth|europe"
+# Create regex patterns for recoding, then recode ----
+usa_pattern <- "u.s.|us|u s|amer|states|united s|rica|murrika|new y|cali|alaska|trump|pittsburgh|carolina|cascadia|yoo ess|jersey"
+uk_pattern <- "uk|united k|england|endland|scotland"
+na_pattern <- "0|one|never|some|god|of|^a$|see|eua|denial|insanity|know|atlantis|fear|narnia|earth|europe"
 
 candy_countries_recoded <- candy_data_complete %>%
   mutate(country = str_to_lower(country),
     country = case_when(
-    str_detect(country, usa_string) ~ "United States",
-    str_detect(country, uk_string) ~ "United Kingdom",
+    str_detect(country, usa_pattern) ~ "United States",
+    str_detect(country, uk_pattern) ~ "United Kingdom",
     str_detect(country, "can") ~ "Canada",
     str_detect(country, "neth") ~ "Netherlands",
     str_detect(country, "esp") ~ "Spain",
     str_detect(country, "uae") ~ "United Arab Emirates",
-    str_detect(country, na_string) ~ NA_character_,
+    str_detect(country, na_pattern) ~ NA_character_,
     TRUE ~ country),
     country = str_to_title(country)
   )
 
-# Check distinct candy names, then recode
+# Check distinct candy names, then recode ----
 distinct_candy <- candy_countries_recoded %>%
   distinct(candy_name) %>%
   arrange(candy_name)
@@ -163,8 +162,5 @@ candy_names_recoded <- candy_countries_recoded %>%
     TRUE ~ candy_name)
   )
 
-distinct_candy <- candy_names_recoded %>%
-  distinct(candy_name) %>%
-  arrange(candy_name)
-
+# write clean data to .csv ----
 write_csv(candy_names_recoded, here("clean_data/candy_data_cleaned.csv"))

@@ -13,7 +13,7 @@ rwa_data_trimmed <- rwa_data %>%
   # filter out any rows where a question has a zero value (i.e, not answered)
   filter(!if_any(starts_with("Q"), ~ . == 0)) %>%
   # Calculate rwa_score for each row. mean of the sums of answers to each question,
-  # Questions in "inv" variable are reverse scored, take the total away from 90 (max possible)
+  # Questions in "inv" variable are reverse scored, take the total away from 100 (max possible)
   rowwise() %>%
   mutate(rwa_score_a = sum(c_across(any_of(rwa_score_qs))),
          rwa_score_b = sum(c_across(any_of(rwa_score_qs_inv))),
@@ -35,7 +35,7 @@ rwa_data_trimmed <- rwa_data %>%
   rename(time_secs = testelapse,
          family_size = familysize)
   
-
+# recode values according to rwa_codebook.txt
 rwa_recoded <- rwa_data_trimmed %>%
   mutate(
     age = case_when(
@@ -73,4 +73,5 @@ rwa_recoded <- rwa_data_trimmed %>%
     )
   )
 
+# write clean data to .csv
 write_csv(rwa_recoded, here("clean_data/rwa_data_cleaned.csv"))
