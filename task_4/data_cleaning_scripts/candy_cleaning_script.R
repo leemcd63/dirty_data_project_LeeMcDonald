@@ -20,10 +20,10 @@ tidy_candy_data <- function(df, df_year) {
            country = matches("country"),
            other_joy = matches("JOY", ignore.case = FALSE),
            other_despair = matches("DESPAIR", ignore.case = FALSE)) %>%
-    # convert age to integer, coercing characters to NA
-    mutate(age = as.integer(age),
+    # extract ages, convert to integer, coercing characters to NA
+    mutate(age = as.integer(str_extract(age, "[0-9]{1,2}")),
     # create unique rater_id based on year and row number
-           rater_id = str_c(str_extract(df_year, "[0-9]{2}$"), "-", row_number()),
+           rater_id = str_c(row_number(), "-",str_extract(df_year, "[0-9]{2}$")),
     # create year column
            year = df_year) %>%
     # pivot longer all candy rating columns
@@ -49,6 +49,20 @@ tidy_candy_data <- function(df, df_year) {
                                 str_remove_all(candy_name, "[\\[\\]]")))
 }
 
+# Function to separate rows in other ratings, add ratings column ----
+separate_other_candy <- function(df, rating_type) {
+  df %>%
+    mutate(candy_name = str_to_lower(candy_name)) %>%
+    separate_rows(candy_name, sep = ",") %>%
+    separate_rows(candy_name, sep = regex(" and ")) %>%
+    separate_rows(candy_name, sep = regex(" or ")) %>%
+    separate_rows(candy_name, sep = regex("(?<!mr|mrs|mt)\\.")) %>%
+    separate_rows(candy_name, sep = regex("[0-9]\\)")) %>%
+    separate_rows(candy_name, sep = regex("\\!+ (?!$)")) %>%
+    mutate(candy_name = str_replace_all(candy_name, "[:punct:]", ""),
+           candy_name = str_trim(candy_name, side = "both"),
+           rating = rating_type)
+}
 
 # Use function to tidy candy datasets ----
 candy_15_long <- tidy_candy_data(candy_data_15, 2015)
@@ -60,24 +74,17 @@ candy_joined <- candy_15_long %>%
   bind_rows(candy_16_long) %>%
   bind_rows(candy_17_long)
 
-# Separate "other_x" columns from joined table ----
+# split "other_x" columns from joined table ----
 other_joy_ratings <- candy_joined %>%
   select(rater_id, other_joy) %>%
+  rename(candy_name = other_joy) %>%
   drop_na() %>%
   distinct()
   
 other_despair_ratings <- candy_joined %>%
   select(rater_id, other_despair) %>%
+  rename(candy_name = other_despair) %>%
   drop_na() %>%
-  distinct()
-
-rater_data <- candy_joined %>%
-  select(rater_id,
-         year,
-         age,
-         gender,
-         country,
-         trick_or_treat) %>%
   distinct()
 
 candy_ratings <- candy_joined %>%
@@ -85,42 +92,26 @@ candy_ratings <- candy_joined %>%
          candy_name,
          rating)
 
+# Split rater information into its own table for re-joining later ----
+rater_data <- candy_joined %>%
+  select(rater_id,
+         year,
+         age,
+         gender,
+         country,
+         trick_or_treat) %>%
+  mutate(gender = coalesce(gender, "Not Specified"),
+         trick_or_treat = coalesce(trick_or_treat, "Not Specified")) %>%
+  distinct()
+
 # Separate rows in other ratings, add ratings column then rejoin tables ----
-other_joy_separated <- other_joy_ratings %>%
-  mutate(other_joy = str_to_lower(other_joy)) %>%
-  separate_rows(other_joy, sep = ",") %>%
-  separate_rows(other_joy, sep = regex(" and ")) %>%
-  separate_rows(other_joy, sep = regex(" or ")) %>%
-  separate_rows(other_joy, sep = regex("(?<!mr|mrs|mt)\\.")) %>%
-  separate_rows(other_joy, sep = regex("[0-9]\\)")) %>%
-  separate_rows(other_joy, sep = regex("\\!+ (?!$)")) %>%
-  mutate(other_joy = str_replace_all(other_joy, "[:punct:]", ""),
-         other_joy = str_trim(other_joy, side = "both"),
-         rating = "JOY") %>%
-  rename(candy_name = other_joy)
+other_joy_separated <- separate_other_candy(other_joy_ratings, "JOY")
+other_despair_separated <- separate_other_candy(other_despair_ratings, "DESPAIR")
 
-other_despair_separated <- other_despair_ratings %>%
-  mutate(other_despair = str_to_lower(other_despair)) %>%
-  separate_rows(other_despair, sep = ",") %>%
-  separate_rows(other_despair, sep = regex(" and ")) %>%
-  separate_rows(other_despair, sep = regex(" or ")) %>%
-  separate_rows(other_despair, sep = regex("(?<!mr|mrs|mt)\\.")) %>%
-  separate_rows(other_despair, sep = regex("[0-9]\\)")) %>%
-  separate_rows(other_despair, sep = regex("\\!+ (?!$)")) %>%
-  mutate(other_despair = str_replace_all(other_despair, "[:punct:]", ""),
-         other_despair = str_trim(other_despair, side = "both"),
-         rating = "DESPAIR") %>%
-  rename(candy_name = other_despair)
-
+# rejoin other candy tables ----
 other_candy_ratings <- other_joy_separated %>%
   bind_rows(other_despair_separated) %>%
   distinct()
-
-# Find distinct "candy names" ---
-distinct_other_candy <- other_candy_ratings %>%
-  select(candy_name) %>%
-  distinct() %>%
-  arrange(candy_name)
 
 # Recode other_ratings ----
 other_candy_recoded <- other_candy_ratings %>%
@@ -147,7 +138,10 @@ other_candy_recoded <- other_candy_ratings %>%
     str_detect(candy_name, "kinder b") ~ "Kinder Bueno",
     str_detect(candy_name, "kinder") ~ "Kinder Surprise",
     str_detect(candy_name, "warheads|war h") ~ "Warheads",
-    str_detect(candy_name, "mms|m m s|mm s|m ms|mm") ~ "M&M's",
+    str_detect(candy_name, "butter mm") ~ "Peanut Butter M&M's",
+    str_detect(candy_name, "mm peanut|peanut mm") ~ "Peanut M&M's",
+    str_detect(candy_name, "mm mint| mint mm") ~ "Mint M&M's",
+    str_detect(candy_name, " mms |m m s| mm s| m ms | mm ") ~ "Other M&M's",
     str_detect(candy_name, "smarties") ~ "Smarties",
     str_detect(candy_name, "cookie") ~ "Cookie",
     str_detect(candy_name, "tootsie|toot|toost") ~ "Tootsie Roll",
@@ -207,7 +201,7 @@ other_candy_recoded <- other_candy_ratings %>%
     str_detect(candy_name, "saltwater|salt w") ~ "Saltwater Taffy",
     str_detect(candy_name, "sour pa") ~ "Sour Patch Kids",
     str_detect(candy_name, "sour") ~ "Other Sour Candy",
-    str_detect(candy_name, "starbur") ~ "Starburst",
+    str_detect(candy_name, "starbur|star bur") ~ "Starburst",
     str_detect(candy_name, "swedish f") ~ "Swedish Fish",
     str_detect(candy_name, "hard cand") ~ "Hard Candy",
     str_detect(candy_name, "twix") ~ "Twix",
@@ -225,15 +219,11 @@ other_candy_recoded <- other_candy_ratings %>%
 
 # Join with candy ratings table and rater_data ----
 candy_ratings_complete <- candy_ratings %>%
-  bind_rows(other_candy_recoded)
+  bind_rows(other_candy_recoded) %>%
+  arrange(rater_id)
   
 candy_ratings_complete <- rater_data %>%
   inner_join(candy_ratings_complete, by = "rater_id")
-
-# Check distinct country names ----
-distinct_countries <- candy_ratings_complete %>%
-  distinct(country) %>%
-  arrange(country)
 
 # Create regex patterns for recoding, then recode ----
 usa_pattern <- "u.s.|us|u s|amer|states|united s|rica|murrika|new y|cali|alaska|trump|pittsburgh|carolina|cascadia|yoo ess|jersey"
@@ -249,17 +239,15 @@ candy_countries_recoded <- candy_ratings_complete %>%
     str_detect(country, "neth") ~ "Netherlands",
     str_detect(country, "esp") ~ "Spain",
     str_detect(country, "uae") ~ "United Arab Emirates",
-    str_detect(country, na_pattern) ~ NA_character_,
+    str_detect(country, na_pattern) ~ "Not Specified",
     TRUE ~ country),
-    country = str_to_title(country)
+    country = str_to_title(country),
+    country = coalesce(country, "Not Specified")
   )
 
-# Check distinct candy names, then recode ----
-distinct_candy <- candy_countries_recoded %>%
-  distinct(candy_name) %>%
-  arrange(candy_name)
 
-candy_na_pattern <- "the board game|low stick|Bottle Caps|Brach products|Chardonnay|Chick-o|Religious|Peaches|Aceta|Hugs|Kale|DVD|Blue-Ray|BooBerry|Sea-salt|Dick|Those|Vicodin|Vials|White Bread|Cash|Dental|chips|Sidewalk|Wheat"
+# Make NA pattern for removing non-candy items and recode ----
+candy_na_pattern <- "the board game|low stick|Bottle Caps|Brach products|Chardonnay|Chick-o|Religious|Peaches|Aceta|Hugs|Kale|DVD|Blue-Ray|BooBerry|Sea-salt|Dick|Those|Vicodin|Vials|White Bread|Cash|Dental|chips|Sidewalk|Wheat|Abstained|Third Party|Green Party|Independent"
 
 candy_cleaned <- candy_countries_recoded %>%
   mutate(candy_name = case_when(
@@ -271,7 +259,12 @@ candy_cleaned <- candy_countries_recoded %>%
     str_detect(candy_name, "Licorice") ~ "Licorice",
     str_detect(candy_name, "Dark Chocolate Hershey") ~ "Hershey's Dark Chocolate",
     str_detect(candy_name, "Sweetums") ~ "Sweetums",
-    str_detect(candy_name, "M&M") ~ "M&M's",
+    str_detect(candy_name, "Peanut Butter M&M's") ~ "Peanut Butter M&M's",
+    str_detect(candy_name, "Peanut M&M") ~ "Peanut M&M's",
+    str_detect(candy_name, "Mint M&M") ~ "Mint M&M's",
+    str_detect(candy_name, "Red M&M") ~ "Red M&M's",
+    str_detect(candy_name, "Blue M&M") ~ "Blue M&M's",
+    str_detect(candy_name, "M&M") ~ "Other M&M's",
     str_detect(candy_name, "Mars") ~ "Mars Bar",
     str_detect(candy_name, "restaurants") ~ "Generic Candy",
     str_detect(candy_name, "Dove") ~ "Dove Bar",
@@ -284,15 +277,37 @@ candy_cleaned <- candy_countries_recoded %>%
     str_detect(candy_name, "Smarties") ~ "Smarties",
     str_detect(candy_name, "Sourpatch") ~ "Sour Patch Kids",
     str_detect(candy_name, "Tolberone") ~ "Toblerone",
-    str_detect(candy_name, "Gummy") ~ "Gummy Bears",
-    str_detect(candy_name, "Gum") ~ "Bubble Gum",
+    str_detect(candy_name, "Gummy Bears") ~ "Gummy Bears",
+    str_detect(candy_name, "Gum | Gum") ~ "Bubble Gum",
     str_detect(candy_name, "Reese’s Peanut Butter Cups") ~ "Reese's Peanut Butter Cups",
-    TRUE ~ candy_name)
-  )
+    TRUE ~ candy_name),
+  ) %>%
+  # remove NAs
+  drop_na(candy_name) %>%
+  # finally add unique id for each indiviual rating, then move to first column
+  mutate(id = row_number()) %>%
+  select(id, everything())
+  
+# Last check for NAs, leaving NAs in age column as would like to keep numeric ----
+candy_cleaned %>%
+  summarise(across(everything(), ~sum(is.na(.x))))
 
-distinct_candy_check <- candy_cleaned %>%
-  distinct(candy_name) %>%
-  arrange(candy_name)
-
-# write clean data to .csv ----
+# Write clean data to .csv ----
 write_csv(candy_cleaned, here("clean_data/candy_data_cleaned.csv"))
+
+# Other notes... ----
+
+# I wrote the below code to check for multiple ratings of the same candy by one rater.
+# These occurances are due to grouping different types of some candy e.g. M&Ms into one category
+# As these are separate ratings in the original data, I will leave these as is for analysis.
+#duplicates <- candy_cleaned %>%
+  #group_by(rater_id, candy_name, rating) %>%
+  #count() %>%
+  #filter(n > 1) %>%
+  #summarise(sum(n))
+
+# Below code would be added before adding unique rating ids to remove duplicates
+  # group_by(rater_id, candy_name, rating) %>%
+  # distinct() %>%
+  # ungroup() %>%
+    
