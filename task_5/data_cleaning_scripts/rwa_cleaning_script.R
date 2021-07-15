@@ -33,7 +33,8 @@ rwa_data_trimmed <- rwa_data %>%
          education) %>%
   # rename a couple
   rename(time_secs = testelapse,
-         family_size = familysize)
+         family_size = familysize,
+         childhood = urban)
   
 # recode values according to rwa_codebook.txt
 rwa_recoded <- rwa_data_trimmed %>%
@@ -46,19 +47,19 @@ rwa_recoded <- rwa_data_trimmed %>%
       gender == 1 ~ "1. Male",
       gender == 2 ~ "2. Female",
       gender == 3 ~ "3. Other",
-      TRUE ~ NA_character_
+      TRUE ~ "Not specified"
     ),
     hand = case_when(
       hand == 1 ~ "1. Right",
       hand == 2 ~ "2. Left",
       hand == 3 ~ "3. Both",
-      TRUE ~ NA_character_
+      TRUE ~ "Not specified"
     ),
-    urban = case_when(
-      urban == 1 ~ "1. Rural",
-      urban == 2 ~ "2. Suburban",
-      urban == 3 ~ "3. Urban",
-      TRUE ~ NA_character_
+    childhood = case_when(
+      childhood == 1 ~ "1. Rural",
+      childhood == 2 ~ "2. Suburban",
+      childhood == 3 ~ "3. Urban",
+      TRUE ~ "Not specified"
     ),
     family_size = case_when(
       family_size <= 50 ~ family_size,
@@ -69,9 +70,10 @@ rwa_recoded <- rwa_data_trimmed %>%
       education == 2 ~ "2. High school",
       education == 3 ~ "3. University degree",
       education == 4 ~ "4. Graduate degree",
-      TRUE ~ NA_character_
+      TRUE ~ "Not specified"
     )
   )
 
 # write clean data to .csv
 write_csv(rwa_recoded, here("clean_data/rwa_data_cleaned.csv"))
+

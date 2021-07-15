@@ -18,8 +18,9 @@ decathlon_data <- read_csv(here("clean_data/decathlon_cleaned.csv"))
 
 ```{r}
 decathlon_data %>%
-  select(id, name, long_jump) %>%
-  slice_max(long_jump, with_ties = TRUE)
+  select(name, event, score) %>%
+  filter(event == "Long jump") %>%
+  slice_max(score, with_ties = TRUE)
 ```
 Clay had the longest long jump in this dataset.
 
@@ -29,7 +30,8 @@ Clay had the longest long jump in this dataset.
 ```{r}
 decathlon_data %>%
   group_by(competition) %>%
-  summarise(avg_100m_time = mean(x100m))
+  filter(event == "100m") %>%
+  summarise(avg_100m_time = mean(score))
   
 ```
 Average 100m time for Decastar was 11.2s and OlympicG 10.9s
@@ -39,9 +41,11 @@ Average 100m time for Decastar was 11.2s and OlympicG 10.9s
 
 ```{r}
 decathlon_data %>%
+  select(name, points, competition) %>%
+  distinct() %>%
   group_by(name) %>%
   summarise(total_points = sum(points)) %>%
-  slice_max(total_points, with_ties = TRUE)
+  slice_max(total_points, n = 1, with_ties = TRUE)
 ```
 Sebrle with 17110 total points
 
@@ -51,15 +55,17 @@ Sebrle with 17110 total points
 ```{r}
 decathlon_data %>%
   group_by(competition) %>%
+  filter(event == "Shot put") %>%
   slice_min(rank, n = 3) %>%
-  select(name, competition, rank, shot_put)
+  select(name, competition, rank, score)
 ```
 
 ## 5. What was the average points for competitors who ran the 400m in less than 50 seconds vs. those than ran 400m in more than 50 seconds?
 
 ```{r}
 decathlon_data %>%
-  mutate(time_400m = if_else(x400m < 50, "Less than 50s", "More than 50s")) %>%
+  filter(event == "400m") %>%
+  mutate(time_400m = if_else(score < 50, "Less than 50s", "More than 50s")) %>%
   group_by(time_400m) %>%
   summarise(avg_points = mean(points))
 ```

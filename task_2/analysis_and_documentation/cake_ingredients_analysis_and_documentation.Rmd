@@ -17,7 +17,9 @@ cake_ingredients <- read_csv(here("clean_data/cake_ingredients_cleaned.csv"))
 ```{r}
 cake_ingredients %>%
   filter(ingredient == "Cocoa") %>%
+  select(-id, -cake_id) %>%
   slice_max(quantity, n = 1, with_ties = TRUE)
+  
 ```
 One Bowl Chocolate cake - 10 tablespoons
 
@@ -55,8 +57,9 @@ Both Babas au Rhum and One Bowl Chocolate cake are tied and have 11 ingredients
 ## 5. Which ingredients are used only once?
 ```{r}
 cake_ingredients %>%
-  count(ingredient) %>%
-  filter(n == 1)
+  group_by(ingredient) %>%
+  summarise(times_used = n()) %>%
+  filter(times_used == 1)
 ```
 
 Bananas, Cream of tartar, crushed ice, dried currants, egg white, nutmeg, nuts and zwiebach are only used once

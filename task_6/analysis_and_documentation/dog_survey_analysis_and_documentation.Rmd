@@ -39,6 +39,8 @@ dog_human_age_avg <- dog_survey %>%
   mutate(dog_age_human = dog_age / 6) %>%
   group_by(dog_gender) %>%
   summarise(avg_human_age = round(mean(dog_age_human, na.rm = TRUE), 1))
+
+dog_human_age_avg
 ```
 
 ## 5. Create a plot of results of question 4.

@@ -34,14 +34,14 @@ dog_survey_clean <- dog_survey %>%
       dog_size == "Medium sized" ~ "M",
       dog_size == "large" ~ "L",
       str_detect(dog_size, "XS|S|M|L|XL") ~ dog_size,
-      TRUE ~ NA_character_
+      TRUE ~ "Not specified"
     ),
     # recode dog_gender column, force NAs on non-valid entries
     dog_gender = str_to_lower(dog_gender),
     dog_gender = case_when(
       str_detect(dog_gender, "fem|^f$") ~ "Female",
       str_detect(dog_gender, "male|^m$") ~"Male",
-      TRUE ~ NA_character_
+      TRUE ~ "Not specified"
     ),
     # extract dog_age from strings, convert to integer
     dog_age = as.integer(
