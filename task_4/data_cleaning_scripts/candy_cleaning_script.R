@@ -309,7 +309,7 @@ write_csv(candy_cleaned, here("clean_data/candy_data_cleaned.csv"))
 # Other notes... ----
 
 # I wrote the below code to check for multiple ratings of the same candy by one rater.
-# These occurances are due to grouping different types of some candy e.g. M&Ms into one category
+# These occurrences are due to grouping different types of some candy e.g. M&Ms into one category
 # As these are separate ratings in the original data, I will leave these as is for analysis.
 #duplicates <- candy_cleaned %>%
   #group_by(rater_id, candy_name, rating) %>%

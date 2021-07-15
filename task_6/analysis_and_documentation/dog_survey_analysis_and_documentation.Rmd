@@ -1,31 +1,171 @@
 ---
-title: "Task 6 - Dog Survey"
-output: html_notebook
+title: "Task 6 - Dog Owners Survey"
+author: "Lee McDonald - DE9"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+  pdf_document: default
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F)
+```
+
+# Introduction
+
+For this task, we have been given a dataset containing responses from dog owners to a survey about dogs, and their spend on dog food.
+
+This data has multiple issues as it appears almost all of the variables are from free text input. The columns containing food spend, dog size, age and gender are particularly inconsistent in their values.
+
+<br>
+
+# Assumptions
+
+Based on the questions we are answering, I will not be removing any columns from the data as they are all relevant.
+
+There are multiple email addresses with more than one "m" on the end of ".com" e.g. ".commm", I've assumed that these are simply typing errors and should be corrected.
+
+Some of the values in `dog_size`, `dog_age` and `dog_gender` appear to represent more than one dog. These should be separated to more than one row, but keeping the same owner's information. Additionally, any values which are missing or do not represent a valid answer should be recoded as "**Not specified**"
+
+I will assume any negative values in the food spend column are in fact positive, as it's unlikely someone has a negative spend on dog food.
+
+<br>
+
+# Data Cleaning
+
+I will be making use of the packages **tidyverse**, **janitor**, and **here** to carry out cleaning.
+
+The first thing I had noticed after loading in the data, is that there were two extra empty columns on the end. 
+
+I chose to remove these using `select()`, remove duplicate rows using `distinct()`, clean the column names using `clean_names()` and then rename `amount_spent_on_dog_food` to `food_spend`.
+
+```{r eval=FALSE}
+dog_survey_clean <- dog_survey %>%
+  # remove two empty columns on the end.
+  select(1:9) %>%
+  # remove duplicate rows
+  distinct() %>%
+  # clean up names
+  clean_names() %>%
+  # rename amount_spent_on_dog_food
+  rename(food_spend = amount_spent_on_dog_food) %>%
+```
+
+Next, I tackled the values for multiple dogs in a single row. 
+
+Using `separate_rows()`, I separated any values in `dog_size`, `dog_gender` and `dog_age` which had "and" or a comma separating them. 
+
+**For reproducibility's sake, this could be further extended to include other characters used, however it's not necessary for this data in particular**
+
+```{r eval=FALSE}
+# use separate_rows to split rows containing data for more than one dog
+  separate_rows(dog_size, dog_gender, dog_age, sep = "and") %>%
+  separate_rows(dog_size, dog_gender, dog_age, sep = ",") %>%
+```
+
+Next was the task of recoding the `email` column. 
+
+Here I used a combination of `mutate()` and `case_when()`, with `str_detect()` to detect a regex pattern of email addresses with multiple "m"s on the end, and `str_replace()` those values with a regular ".com".
+
+I then checked all other values in `email` for a (very basic) regex pattern to detect a valid email address, any non-valid emails would be changed to `NA`.
+
+```{r eval=FALSE}
+    mutate(
+    # fix ".com" email addresses with multiple ms on the end,
+    # check for actual email addresses, force NAs on non-valid entries
+    email = case_when(
+      str_detect(email, "\\.comm+$") ~ str_replace(email, "\\.comm+$", ".com"),
+      str_detect(email, "@\\w+-*\\w*\\.") ~ email,
+      TRUE ~ NA_character_
+    ),
+```
+
+Continuing the `mutate()` above, I then used `str_extract()` with a regex pattern to detect a price, then convert to numeric type. Any values not containing a price will be coerced to `NA`.
+
+```{r eval=FALSE}
+    # extract prices from food_spend column, convert to numeric type
+    food_spend = as.numeric(
+      str_extract(food_spend, "(?<=£)\\d+\\.?\\d*"), digits = 2),
+```
+
+Now, recoding the `dog_size` and `dog_gender` columns. Again I have used `case_when()` to recode values which are obviously sizes or gender but not in the correct format. Any values which are not valid are recoded to "**Not specified**".
+
+```{r eval=FALSE}
+    # recode dog_size column, non-valid entries to be "Not specified"
+    dog_size = case_when(
+      dog_size == "Smallish" ~ "S",
+      dog_size == "Medium sized" ~ "M",
+      dog_size == "large" ~ "L",
+      str_detect(dog_size, "XS|S|M|L|XL") ~ dog_size,
+      TRUE ~ "Not specified"
+    ),
+    # recode dog_gender column, non-valid entries to be "Not specified"
+    dog_gender = str_to_lower(dog_gender),
+    dog_gender = case_when(
+      str_detect(dog_gender, "fem|^f$") ~ "Female",
+      str_detect(dog_gender, "male|^m$") ~"Male",
+      TRUE ~ "Not specified"
+    ),
+```
+
+Extracting the `dog_age` values from character strings next, then converting to integer and forcing `NA` on invalid values.
+
+```{r eval=FALSE}
+    # extract dog_age from strings, convert to integer
+    dog_age = as.integer(
+      str_extract(dog_age, "\\d+")
+    ),
+```
+
+Finally, we must renew the unique `id` column, as after splitting rows above, these rows all have the same `id.`
+
+```{r eval=FALSE}
+    # renew id column to make unique after splitting rows
+    id = row_number()
+  )
+```
+
+
+<br>
+
+# Analysis
 
 ```{r}
 library(tidyverse)
 library(here)
-```
 
-```{r}
+# Read in clean data
 dog_survey <- read_csv(here("clean_data/dog_survey_clean.csv"))
+
+# Preview data
+dog_survey
 ```
 
-## 1. The client only counts a valid email address as one ending in ‘.com’. How many survey results have a valid email address.
+
+## Question 1 
+**The client only counts a valid email address as one ending in ‘.com’. How many survey results have a valid email address?**
+
 ```{r}
 dog_survey %>%
   summarise(total_valid_email = sum(str_detect(email, "\\.com$"), na.rm = TRUE))
 ```
 
-## 2. What’s the average amount spent on dog food for each dog size.
+## Question 2 
+**What’s the average amount spent on dog food for each dog size?**
+
 ```{r}
 dog_survey %>%
   group_by(dog_size) %>%
   summarise(avg_food_spend = round(mean(food_spend, na.rm = TRUE), 2))
 ```
 
-## 3. For owners whose surname starts with a letter in the second half of the alphabet (N onwards) what is the average age of their dog?
+## Question 3 
+**For owners whose surname starts with a letter in the second half of the alphabet (N onwards) what is the average age of their dog?**
+
+
 ```{r}
 dog_survey %>%
   filter(str_detect(last_name, "^[N-Z]")) %>%
@@ -33,7 +173,9 @@ dog_survey %>%
 ```
 
 
-## 4. The dog_age column is the age in dog years. If the conversion is 1 human year = 6 dog years, then what is the average human age for dogs of each gender?
+## Question 4 
+**The dog_age column is the age in dog years. If the conversion is 1 human year = 6 dog years, then what is the average human age for dogs of each gender?**
+
 ```{r}
 dog_human_age_avg <- dog_survey %>%
   mutate(dog_age_human = dog_age / 6) %>%
@@ -43,8 +185,8 @@ dog_human_age_avg <- dog_survey %>%
 dog_human_age_avg
 ```
 
-## 5. Create a plot of results of question 4.
-
+## Question 5 
+**Create a plot of results of question 4.**
 ```{r}
 ggplot(dog_human_age_avg, aes(x = dog_gender, y = avg_human_age)) +
   geom_point()

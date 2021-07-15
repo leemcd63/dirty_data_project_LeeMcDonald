@@ -28,7 +28,7 @@ dog_survey_clean <- dog_survey %>%
     # extract prices from food_spend column, convert to numeric type
     food_spend = as.numeric(
       str_extract(food_spend, "(?<=£)\\d+\\.?\\d*"), digits = 2),
-    # recode dog_size column, force NAs on non-valid entries
+    # recode dog_size column, non-valid entries to be "Not specified"
     dog_size = case_when(
       dog_size == "Smallish" ~ "S",
       dog_size == "Medium sized" ~ "M",
@@ -36,7 +36,7 @@ dog_survey_clean <- dog_survey %>%
       str_detect(dog_size, "XS|S|M|L|XL") ~ dog_size,
       TRUE ~ "Not specified"
     ),
-    # recode dog_gender column, force NAs on non-valid entries
+    # recode dog_gender column, non-valid entries to be "Not specified"
     dog_gender = str_to_lower(dog_gender),
     dog_gender = case_when(
       str_detect(dog_gender, "fem|^f$") ~ "Female",

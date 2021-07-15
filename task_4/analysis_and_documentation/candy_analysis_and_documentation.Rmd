@@ -46,6 +46,8 @@ Any ratings of "candy" which is **not** a real candy will also be removed.
 
 # Data Cleaning
 
+I will be making use of the packages **tidyverse**, **janitor**, **here** and **readxl** to carry out cleaning.
+
 At a first glance, it's easy to see this data is not in "tidy format". There are way too many variables per observation, and it would be much better for analysis if the data was in long format, with each observation being a single candy rating from a respondent.
 
 We can also see the variable names are not clean, and also differ between the three sets of data. This would cause issues when attempting to join the tables together.
@@ -248,7 +250,7 @@ library(here)
 candy_data <- read_csv(here("clean_data/candy_data_cleaned.csv"))
 
 # Preview data
-head(candy_data)
+candy_data
 ```
 
 <br>
