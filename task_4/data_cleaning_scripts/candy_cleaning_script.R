@@ -10,6 +10,7 @@ candy_data_17 <- read_xlsx(here("raw_data/boing-boing-candy-2017.xlsx"))
 
 # General function for candy data sets to select columns, clean column names and
 # convert to long format ----
+# Variables: df = candy data frame, df_year = year data is from
 tidy_candy_data <- function(df, df_year) {
   df %>%
     # rename columns needed for analysis
@@ -18,8 +19,9 @@ tidy_candy_data <- function(df, df_year) {
            trick_or_treat = matches("going"),
            gender = matches("gender"),
            country = matches("country"),
+           # ignore.case here necessary as there was a candy named "JoyJoy"
            other_joy = matches("JOY", ignore.case = FALSE),
-           other_despair = matches("DESPAIR", ignore.case = FALSE)) %>%
+           other_despair = matches("DESPAIR")) %>%
     # extract ages, convert to integer, coercing characters to NA
     mutate(age = as.integer(str_extract(age, "[0-9]{1,2}")),
     # create unique rater_id based on year and row number
@@ -34,6 +36,8 @@ tidy_candy_data <- function(df, df_year) {
     select(rater_id, 
            year, 
            age,
+           # will give error if gender and country are specifically selected,
+           # starts_with will return nothing if not found (2015 specific)
            starts_with("gender"),
            starts_with("country"),
            trick_or_treat,
@@ -50,17 +54,23 @@ tidy_candy_data <- function(df, df_year) {
 }
 
 # Function to separate rows in other ratings, add ratings column ----
+# Variables: df = other_x_ratings data, rating_type = either "JOY" or "DESPAIR"
 separate_other_candy <- function(df, rating_type) {
   df %>%
+    # Convert all variables to lower case
     mutate(candy_name = str_to_lower(candy_name)) %>%
+    # Use separate_rows to split common separators of multiple candy names
     separate_rows(candy_name, sep = ",") %>%
     separate_rows(candy_name, sep = regex(" and ")) %>%
     separate_rows(candy_name, sep = regex(" or ")) %>%
+    # this one specifically to avoid splitting Mr. Goodbar/Mt. Dew etc...
     separate_rows(candy_name, sep = regex("(?<!mr|mrs|mt)\\.")) %>%
     separate_rows(candy_name, sep = regex("[0-9]\\)")) %>%
     separate_rows(candy_name, sep = regex("\\!+ (?!$)")) %>%
+    # remove all punctuation and spaces on the sides of strings,
     mutate(candy_name = str_replace_all(candy_name, "[:punct:]", ""),
            candy_name = str_trim(candy_name, side = "both"),
+           # add rating column for "JOY" or "DESPAIR"
            rating = rating_type)
 }
 
@@ -104,7 +114,7 @@ rater_data <- candy_joined %>%
          trick_or_treat = coalesce(trick_or_treat, "Not Specified")) %>%
   distinct()
 
-# Separate rows in other ratings, add ratings column then rejoin tables ----
+# Use function to separate rows in other ratings, add ratings column then rejoin tables ----
 other_joy_separated <- separate_other_candy(other_joy_ratings, "JOY")
 other_despair_separated <- separate_other_candy(other_despair_ratings, "DESPAIR")
 
@@ -218,12 +228,12 @@ other_candy_recoded <- other_candy_ratings %>%
   drop_na()
 
 # Join with candy ratings table and rater_data ----
-candy_ratings_complete <- candy_ratings %>%
+candy_ratings_joined <- candy_ratings %>%
   bind_rows(other_candy_recoded) %>%
   arrange(rater_id)
   
 candy_ratings_complete <- rater_data %>%
-  inner_join(candy_ratings_complete, by = "rater_id")
+  inner_join(candy_ratings_joined, by = "rater_id")
 
 # Create regex patterns for recoding, then recode ----
 usa_pattern <- "u.s.|us|u s|amer|states|united s|rica|murrika|new y|cali|alaska|trump|pittsburgh|carolina|cascadia|yoo ess|jersey"
@@ -231,6 +241,7 @@ uk_pattern <- "uk|united k|england|endland|scotland"
 na_pattern <- "0|one|never|some|god|of|^a$|see|eua|denial|insanity|know|atlantis|fear|narnia|earth|europe"
 
 candy_countries_recoded <- candy_ratings_complete %>%
+  # make all values lower case
   mutate(country = str_to_lower(country),
     country = case_when(
     str_detect(country, usa_pattern) ~ "United States",
@@ -241,13 +252,14 @@ candy_countries_recoded <- candy_ratings_complete %>%
     str_detect(country, "uae") ~ "United Arab Emirates",
     str_detect(country, na_pattern) ~ "Not Specified",
     TRUE ~ country),
+    # make all countries"title" case format
     country = str_to_title(country),
     country = coalesce(country, "Not Specified")
   )
 
 
 # Make NA pattern for removing non-candy items and recode ----
-candy_na_pattern <- "the board game|low stick|Bottle Caps|Brach products|Chardonnay|Chick-o|Religious|Peaches|Aceta|Hugs|Kale|DVD|Blue-Ray|BooBerry|Sea-salt|Dick|Those|Vicodin|Vials|White Bread|Cash|Dental|chips|Sidewalk|Wheat|Abstained|Third Party|Green Party|Independent"
+candy_na_pattern <- "Sweetums|the board game|low stick|Bottle Caps|Brach products|Chardonnay|Chick-o|Religious|Peaches|Aceta|Hugs|Kale|DVD|Blue-Ray|BooBerry|Sea-salt|Dick|Those|Vicodin|Vials|White Bread|Cash|Dental|chips|Sidewalk|Wheat|Abstained|Third Party|Green Party|Independent"
 
 candy_cleaned <- candy_countries_recoded %>%
   mutate(candy_name = case_when(
@@ -258,7 +270,6 @@ candy_cleaned <- candy_countries_recoded %>%
     str_detect(candy_name, "JoyJoy") ~ "JoyJoy",
     str_detect(candy_name, "Licorice") ~ "Licorice",
     str_detect(candy_name, "Dark Chocolate Hershey") ~ "Hershey's Dark Chocolate",
-    str_detect(candy_name, "Sweetums") ~ "Sweetums",
     str_detect(candy_name, "Peanut Butter M&M's") ~ "Peanut Butter M&M's",
     str_detect(candy_name, "Peanut M&M") ~ "Peanut M&M's",
     str_detect(candy_name, "Mint M&M") ~ "Mint M&M's",
