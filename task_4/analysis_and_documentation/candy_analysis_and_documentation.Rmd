@@ -23,6 +23,8 @@ This data is particularly dirty, with around 100 columns containing ratings of d
 
 All candy is rated on a scale of "JOY", "MEH", or "DESPAIR" - however the 2015 data does not include "MEH", and does not include columns for gender or country.
 
+<br>
+
 # Assumptions
 
 Based on the questions we are looking to answer, I have assumed that any data other than the following is unnecessary:
@@ -34,12 +36,13 @@ Based on the questions we are looking to answer, I have assumed that any data ot
 * Candy names and their ratings
 * Responses to the "other candy" columns
 
-Any age values which are 100 and over will be removed, as it's unlikely anyone responding to this survey is actually that old. The candy ratings data from these respondents will be preserved.
+Any age values which are **100 and over** will be removed, as it's unlikely anyone responding to this survey is actually that old. The candy ratings data from these respondents will be preserved.
 
-Responses to the country column which are not a real country, or misspellings/abbreviations of real countries will be categorised as "Not specified".
+Responses to the country column which are **not** a real country, or misspellings/abbreviations of real countries will be categorised as "Not specified".
 
-Any ratings of candy which is not a real candy will also be removed.
+Any ratings of "candy" which is **not** a real candy will also be removed.
 
+<br>
 
 # Data Cleaning
 
@@ -49,9 +52,9 @@ We can also see the variable names are not clean, and also differ between the th
 
 The age column is in character format, with some free text input from users. Where possible, an age should be extracted from these values, and then convert the column to a numeric type for analysis.
 
-There is an existing "timestamp" column which acts as a unique identifier for each row, however it is not ideal and a new ID should be generated for each respondent to the survey. Similarly, there is no column for year, which we will need for some of our later analysis, and to help differentiate data from each year.
+There is an existing `timestamp` column which acts as a unique identifier for each row, however it is not ideal and a new ID should be generated for each respondent to the survey. Similarly, there is no column for year, which we will need for some of our later analysis, and to help differentiate data from each year.
 
-Initially, I had written code to carry out each step above for each year's data. Taking into mind the DRY principle, and after much trial and error, I developed the below function for this purpose:
+Initially, I had written code to carry out each step above for each year's data. Keeping in mind the DRY principle, and after much trial and error, I developed the below function for this purpose:
 
 ```{r eval=FALSE}
 # General function for candy data to select columns, clean column names and
@@ -102,7 +105,7 @@ tidy_candy_data <- function(df, df_year) {
 }
 ```
 
-The function was then applied as below:
+The function `tidy_candy_data` was then applied as below:
 ```{r eval=FALSE}
 # Use function to tidy candy datasets ----
 candy_15_long <- tidy_candy_data(candy_data_15, 2015)
@@ -110,19 +113,22 @@ candy_16_long <- tidy_candy_data(candy_data_16, 2016)
 candy_17_long <- tidy_candy_data(candy_data_17, 2017)
 ```
 
-Next I joined the three tables using bind_rows(), as the variable names are now consistent throughout. Now we have all the data in single table, with a tidy long format, but there is still much more to be done. 
+Next I joined the three tables using `bind_rows()`, as the variable names are now consistent throughout. Now we have all the data in single table, with a tidy long format, but there is still much more to be done. 
 
-The next step I took was to tackle the free text input in the other_joy and other_despair columns. 
+The next step I took was to tackle the free text input in the `other_joy` and `other_despair` columns. 
 
 My approach was to split up the table into 4 parts:
-- rater_data containing rater_id and all other attributes (age, gender, etc.), with rater_id acting as a primary key.
-- candy_ratings containing rater_id, candy_name and ratings
-- other_joy_ratings containing rater_id and the text input from the other_joy column, renaming this to candy_name
-- other_despair_ratings same as above, but for other_despair
 
-Separating out the values within the other ratings was perhaps the trickiest part of this entire task due to the nature of the free text input, with a huge amount of inconsistency throughout. If I'd had the chance to revisit this task, my results could definitely be improved, however it would require a lot of time (and Regex)!
+* `rater_data` containing `rater_id` and all other attributes (`age`, `gender`, etc.), with `rater_id` acting as a primary key.
+* `candy_ratings` containing `rater_id`, `candy_name` and `rating`
+* `other_joy_ratings` containing `rater_id` and the text input from the `other_joy` column, renaming this to `candy_name`
+* `other_despair_ratings` same as above, but for `other_despair`
 
-Similarly to my method of converting the data to tidy format, I originally had written code for both joy and despair ratings, but then managed to write a function to take care of this.
+Separating out the values within the other ratings was perhaps the trickiest part of this entire task due to the nature of the free text input, with a huge amount of inconsistency throughout. 
+
+**If I'd had the chance to revisit this task, my results could definitely be improved, however it would require a lot of time (and regex)!**
+
+Similar to my method of converting the data to tidy format, I originally had written code for both JOY and DESPAIR ratings, but then managed to write a function to take care of this:
 
 ```{r eval=FALSE}
 # Function to separate rows in other ratings, add ratings column ----
@@ -147,14 +153,18 @@ separate_other_candy <- function(df, rating_type) {
 }
 ```
 
-This function was then applied as below:
+This function `separate_other_candy` was then applied as below:
 ```{r eval=FALSE}
 # Use function to separate rows in other ratings, add ratings column
 other_joy_separated <- separate_other_candy(other_joy_ratings, "JOY")
 other_despair_separated <- separate_other_candy(other_despair_ratings, "DESPAIR")
 ```
 
-I then used bind_rows() to join the two sets with other candy ratings together. Once this was complete, it was time to recode the values in the candy_name column. This was not an exhaustive list, but it ended up being rather long. Given more time this could be tweaked for further accuracy. Any values which did not match the regex patterns in my case_when() arguments were changed to NA values, and then dropped.
+I then used `bind_rows()` to join the two sets with other candy ratings together. Once this was complete, it was time to recode the values in the `candy_name` column. 
+
+**This is not an exhaustive list, but it ended up being rather long. Given more time this could be tweaked for further accuracy.**
+
+Any values which did not match the regex patterns in my `case_when()` arguments were changed to `NA` values, and then dropped.
 ```{r eval=FALSE}
 # Recode other_ratings ----
 other_candy_recoded <- other_candy_ratings %>%
@@ -171,7 +181,7 @@ other_candy_recoded <- other_candy_ratings %>%
   drop_na()
 ```
 
-I then joined this with my existing candy_ratings and rater_data tables to once again, have a complete table.
+I then joined this with my existing `candy_ratings` and `rater_data` tables to once again, have a complete table.
 ```{r eval=FALSE}
 # Join with candy ratings table and rater_data ----
 candy_ratings_joined <- candy_ratings %>%
@@ -182,7 +192,9 @@ candy_ratings_complete <- rater_data %>%
   inner_join(candy_ratings_joined, by = "rater_id")
 ```
 
-The next step was to recode the values in countries, like above, I used case_when to replace values here. As this was a free text input there were multiple spellings for a country, in particular the USA and UK. I created variables to act as Regex patterns for USA, UK and for non-countries which would be "Not Specified". After this I used coalesce() to replace all NA values with "Not Specified".
+The next step was to recode the values in countries, like above, I used `case_when()` to replace values. As this was a free text input there were multiple spellings for a country, in particular the USA and UK. 
+
+I created variables to act as regex patterns for **USA**, **UK** and for non-countries which would be **"Not Specified"**. After this I used `coalesce()` to replace all `NA` values with **"Not Specified"**.
 
 ```{r eval=FALSE}
 # Create regex patterns for recoding, then recode ----
@@ -203,7 +215,9 @@ candy_countries_recoded <- candy_ratings_complete %>%
   )
 ```
 
-The very last step in cleaning this data was recoding our candy_names, in particular removing non-candy values. I achieved this using the same method as above. After changing all non-candy items to NA, and tidying up the candy names using case_when, I used drop_na() to remove these ratings and then added a unique ID row for every rating in the data.
+The very last step in cleaning this data was recoding our `candy_names`, in particular removing non-candy values. I achieved this using the same method as above. 
+
+After recoding all non-candy items to `NA`, and tidying up the `candy_names` using `case_when()`, I used `drop_na()` to remove these ratings and then added a unique `id` for every rating in the data.
 
 ```{r eval=FALSE}
 # Make NA pattern for removing non-candy items and recode ----
@@ -233,27 +247,33 @@ library(here)
 # Read in clean data
 candy_data <- read_csv(here("clean_data/candy_data_cleaned.csv"))
 
+# Preview data
 head(candy_data)
 ```
 
-
+<br>
 
 ## Question 1
 **What is the total number of candy ratings given across the three years. (number of candy ratings, not number of raters. Don’t count missing values)**
 
-To answer this question I have dropped all rows with no rating, then summarised using n() to find the total number of rows. Note: Using drop_na() wasn't necessary here as the clean data has already had all NA values removed.
+To answer this question I used `drop_na()` to remove all rows with no rating, then summarised with `n()` to find the total number of ratings. 
+
+**Note: Using `drop_na()` wasn't necessary here as the clean data has already had all NA values removed.**
 ```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=TRUE}
 candy_data %>%
   drop_na(rating) %>%
   summarise(total_num_ratings = n())
 ```
 
+<br>
 
 ## Question 2 and 3
 **What was the average age of people who are going out trick or treating?**
 **What was the average age of people who are not going trick or treating?**
 
-First I have dropped NA values in the age column, and filtered for distinct values of rater_id so we had one age per rater. Then I grouped by trick_or_treat and summarised to find the mean age per response to the trick or treat question. I've grouped these questions together as I thought it would be interesting to see the average age of those who did not respond to the question also.
+First I have dropped `NA` values in the `age` column, and used `distinct()` on `rater_id` so we had one age per `rater_id.` Then I grouped by `trick_or_treat` and summarised to find the mean age per response to the trick or treat question. 
+
+I've grouped these questions together as I thought it would also be interesting to see the average age of those who did not respond to the question.
 ```{r}
 candy_data %>%
   drop_na(age) %>%
@@ -262,10 +282,14 @@ candy_data %>%
   summarise(average_age = round(mean(age), digits = 1))
 ```
 
-## Question 4
-**For each of joy, despair and meh, which candy bar recieved the most of these ratings?**
+<br>
 
-First I have grouped by both rating and candy_name, then used summarise to count the number of each rating per candy using n(). After this I used slice_max() to pick the top result in each rating. Note: I have included the with_ties argument in the event of two candies having the same amount of ratings.
+## Question 4
+**For each of joy, despair and meh, which candy bar received the most of these ratings?**
+
+First I used `group_by()` for both `rating` and `candy_name`, then used `summarise()` to count the number of each rating per candy using `n()`. After this I used `slice_max()` to pick the top result in each `rating`. 
+
+**Note: I have included the `with_ties` argument in the event of two candies having the same amount of ratings.**
 ```{r message=FALSE, warning=FALSE}
 candy_data %>%
   group_by(rating, candy_name) %>%
@@ -274,19 +298,24 @@ candy_data %>%
   
 ```
 
+<br>
+
 ## Question 5
 **How many people rated Starburst as despair?**
 
-To find this, first I have filtered by candy_name and rating, so we are left with only rows matching Starburst and despair. Then I used summarise and n() to find the total number of despair ratings.
+To find this, first I have filtered by `candy_name` and `rating`, so we are left with only rows matching "**Starburst**" and "**DESPAIR**". Then I used `summarise` and `n()` to find the total number of DESPAIR ratings.
 ```{r}
 candy_data %>%
   filter(candy_name == "Starburst",
          rating == "DESPAIR") %>%
   summarise(starburst_despair_count = n())
 ```
+
+<br>
+
 **For the next three questions, count despair as -1, joy as +1 and meh as 0.**
 
-Using case_when(), I have recoded the values in the rating column to match the numeric values, and also changed the variable type using as.integer() to avoid any potential errors during calculation.
+Using `case_when()`, I have recoded the values in the `rating` column to match the numeric values, and also changed the variable type using `as.integer()` to avoid any potential errors during calculation.
 
 ```{r}
 candy_rating_int <- candy_data %>%
@@ -298,10 +327,12 @@ candy_rating_int <- candy_data %>%
   )
 ```
 
+<br>
+
 ## Question 6
 **What was the most popular candy bar by this rating system for each gender in the dataset?**
 
-Using our new dataset with integer values as ratings, I've first grouped by gender and candy_name, then summarised using sum(rating) to calculate the total rating for each candy. After this I used slice_max() to pick the highest rated candy of each gender.
+Using our new dataset with integer values as ratings, I've first grouped by `gender` and `candy_name`, then summarised using `sum(rating)` to calculate the `total_rating` for each candy. After this I used `slice_max()` to return the highest rated candy of each `gender`.
 
 ```{r}
 candy_rating_int %>%
@@ -309,7 +340,7 @@ candy_rating_int %>%
   summarise(total_rating = sum(rating)) %>%
   slice_max(total_rating, n = 1, with_ties = TRUE)
 ```
-As we can see from the result, "Any full-sized candy bar" has the highest rating for every gender. As this is quite a general definition, we are likely to get better answers to this question if we filter this out from our results:
+As we can see from the result, "**Any full-sized candy bar**" has the highest rating for every gender. As this is quite a general definition, we are likely to get better answers to this question if we filter this out from our results:
 ```{r}
   candy_rating_int %>%
   filter(candy_name != "Any full-sized candy bar") %>%
@@ -318,11 +349,12 @@ As we can see from the result, "Any full-sized candy bar" has the highest rating
   slice_max(total_rating, n = 1, with_ties = TRUE)
 ```
 
+<br>
 
 ## Question 7
 **What was the most popular candy bar in each year?**
 
-Using the same method as Question 6, I first grouped by year and candy_name, then summarised using sum(rating) to find the total_rating for each candy, and used slice_max() to pick the highest rated candy per year.
+Using the same method as Question 6, I first grouped by `year` and `candy_name`, then summarised using `sum(rating)` to find the `total_rating` for each candy, and used `slice_max()` to return the highest rated candy per `year`.
 ```{r}
 candy_rating_int %>%
   group_by(year, candy_name) %>%
@@ -331,7 +363,7 @@ candy_rating_int %>%
 
 ```
 
-Similar to Question 6, "Any full-sized candy bar" is the highest rated for each year. If we filter it out from our results the answer is as follows:
+Like Question 6, "**Any full-sized candy bar**" is the highest rated for each year. If we filter it out from our results the answer is as follows:
 ```{r}
 candy_rating_int %>%
   filter(candy_name != "Any full-sized candy bar") %>%
@@ -340,15 +372,16 @@ candy_rating_int %>%
   slice_max(total_rating, n = 1, with_ties = TRUE)
 ```
 
+<br>
 
 ## Question 8. 
 **What was the most popular candy bar by this rating for people in US, Canada, UK and all other countries?**
 
-Here we are looking for all countries other than US, UK and Canada to be classed as "Other". 
+Here we are looking for all countries other than **US**, **UK** and **Canada** to be classed as "**Other**". 
 
-To achieve this I used case_when() and str_detect() to keep all values in countries the same if they matched "United Kingdom", "United States" or "Canada". Any other values will be changed to "Other".
+To achieve this I used `case_when()` and `str_detect()` to keep all values in countries the same if they matched "United Kingdom", "United States" or "Canada". Any other values will be changed to "Other".
 
-Now we can group by country and candy_name, summarise using sum(rating) and find the candy with the highest total_rating for each country using slice_max()
+Now we can `group_by()` `country` and `candy_name`, `summarise()` using `sum(rating)` and find the candy with the highest `total_rating` for each `country` using `slice_max()`
 ```{r}
 candy_rating_int %>%
   mutate(country = case_when(
@@ -359,9 +392,11 @@ candy_rating_int %>%
   summarise(total_rating = sum(rating)) %>%
   slice_max(total_rating, n = 1, with_ties = TRUE)
 ```
-As with Q6 and Q7, "Any full-sized candy bar" has taken the top spot for every country. Interestingly the UK has 4 tied results for the total_rating, a good example of why the with_ties argument in slice_max() is useful!
+As with Q6 and Q7, "**Any full-sized candy bar**" has taken the top spot for every `country`. 
 
-If we filter out "Any full-sized candy bar" again, the results are:
+Interestingly the UK has **4 tied results** for the `total_rating`, a good example of why the `with_ties` argument in `slice_max()` is useful!
+
+If we filter out "**Any full-sized candy bar**" again, the results are:
 ```{r}
 candy_rating_int %>%
   filter(candy_name != "Any full-sized candy bar") %>%

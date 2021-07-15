@@ -253,6 +253,7 @@ div.tocify {
 <p>For this task, we have been provided with 3 datasets containing responses to a Halloween candy rating survey from 2015, 2016 and 2017.</p>
 <p>This data is particularly dirty, with around 100 columns containing ratings of different “candy” - many of which are not actually candy. Additionally, there are multiple columns that have free text input from respondents to the survey, including country, age, and two columns describing other candy they approve or disapprove of.</p>
 <p>All candy is rated on a scale of “JOY”, “MEH”, or “DESPAIR” - however the 2015 data does not include “MEH”, and does not include columns for gender or country.</p>
+<p><br></p>
 </div>
 <div id="assumptions" class="section level1" number="2">
 <h1 number="2"><span class="header-section-number">2</span> Assumptions</h1>
@@ -265,17 +266,18 @@ div.tocify {
 <li>Candy names and their ratings</li>
 <li>Responses to the “other candy” columns</li>
 </ul>
-<p>Any age values which are 100 and over will be removed, as it’s unlikely anyone responding to this survey is actually that old. The candy ratings data from these respondents will be preserved.</p>
-<p>Responses to the country column which are not a real country, or misspellings/abbreviations of real countries will be categorised as “Not specified”.</p>
-<p>Any ratings of candy which is not a real candy will also be removed.</p>
+<p>Any age values which are <strong>100 and over</strong> will be removed, as it’s unlikely anyone responding to this survey is actually that old. The candy ratings data from these respondents will be preserved.</p>
+<p>Responses to the country column which are <strong>not</strong> a real country, or misspellings/abbreviations of real countries will be categorised as “Not specified”.</p>
+<p>Any ratings of “candy” which is <strong>not</strong> a real candy will also be removed.</p>
+<p><br></p>
 </div>
 <div id="data-cleaning" class="section level1" number="3">
 <h1 number="3"><span class="header-section-number">3</span> Data Cleaning</h1>
 <p>At a first glance, it’s easy to see this data is not in “tidy format”. There are way too many variables per observation, and it would be much better for analysis if the data was in long format, with each observation being a single candy rating from a respondent.</p>
 <p>We can also see the variable names are not clean, and also differ between the three sets of data. This would cause issues when attempting to join the tables together.</p>
 <p>The age column is in character format, with some free text input from users. Where possible, an age should be extracted from these values, and then convert the column to a numeric type for analysis.</p>
-<p>There is an existing “timestamp” column which acts as a unique identifier for each row, however it is not ideal and a new ID should be generated for each respondent to the survey. Similarly, there is no column for year, which we will need for some of our later analysis, and to help differentiate data from each year.</p>
-<p>Initially, I had written code to carry out each step above for each year’s data. Taking into mind the DRY principle, and after much trial and error, I developed the below function for this purpose:</p>
+<p>There is an existing <code>timestamp</code> column which acts as a unique identifier for each row, however it is not ideal and a new ID should be generated for each respondent to the survey. Similarly, there is no column for year, which we will need for some of our later analysis, and to help differentiate data from each year.</p>
+<p>Initially, I had written code to carry out each step above for each year’s data. Keeping in mind the DRY principle, and after much trial and error, I developed the below function for this purpose:</p>
 <pre class="r"><code># General function for candy data to select columns, clean column names and
 # convert to long format ----
 
@@ -322,16 +324,23 @@ tidy_candy_data &lt;- function(df, df_year) {
                                 str_remove(candy_name, &quot;Q6 \\| &quot;), 
                                 str_remove_all(candy_name, &quot;[\\[\\]]&quot;)))
 }</code></pre>
-<p>The function was then applied as below:</p>
+<p>The function <code>tidy_candy_data</code> was then applied as below:</p>
 <pre class="r"><code># Use function to tidy candy datasets ----
 candy_15_long &lt;- tidy_candy_data(candy_data_15, 2015)
 candy_16_long &lt;- tidy_candy_data(candy_data_16, 2016)
 candy_17_long &lt;- tidy_candy_data(candy_data_17, 2017)</code></pre>
-<p>Next I joined the three tables using bind_rows(), as the variable names are now consistent throughout. Now we have all the data in single table, with a tidy long format, but there is still much more to be done.</p>
-<p>The next step I took was to tackle the free text input in the other_joy and other_despair columns.</p>
-<p>My approach was to split up the table into 4 parts: - rater_data containing rater_id and all other attributes (age, gender, etc.), with rater_id acting as a primary key. - candy_ratings containing rater_id, candy_name and ratings - other_joy_ratings containing rater_id and the text input from the other_joy column, renaming this to candy_name - other_despair_ratings same as above, but for other_despair</p>
-<p>Separating out the values within the other ratings was perhaps the trickiest part of this entire task due to the nature of the free text input, with a huge amount of inconsistency throughout. If I’d had the chance to revisit this task, my results could definitely be improved, however it would require a lot of time (and Regex)!</p>
-<p>Similarly to my method of converting the data to tidy format, I originally had written code for both joy and despair ratings, but then managed to write a function to take care of this.</p>
+<p>Next I joined the three tables using <code>bind_rows()</code>, as the variable names are now consistent throughout. Now we have all the data in single table, with a tidy long format, but there is still much more to be done.</p>
+<p>The next step I took was to tackle the free text input in the <code>other_joy</code> and <code>other_despair</code> columns.</p>
+<p>My approach was to split up the table into 4 parts:</p>
+<ul>
+<li><code>rater_data</code> containing <code>rater_id</code> and all other attributes (<code>age</code>, <code>gender</code>, etc.), with <code>rater_id</code> acting as a primary key.</li>
+<li><code>candy_ratings</code> containing <code>rater_id</code>, <code>candy_name</code> and <code>rating</code></li>
+<li><code>other_joy_ratings</code> containing <code>rater_id</code> and the text input from the <code>other_joy</code> column, renaming this to <code>candy_name</code></li>
+<li><code>other_despair_ratings</code> same as above, but for <code>other_despair</code></li>
+</ul>
+<p>Separating out the values within the other ratings was perhaps the trickiest part of this entire task due to the nature of the free text input, with a huge amount of inconsistency throughout.</p>
+<p><strong>If I’d had the chance to revisit this task, my results could definitely be improved, however it would require a lot of time (and regex)!</strong></p>
+<p>Similar to my method of converting the data to tidy format, I originally had written code for both JOY and DESPAIR ratings, but then managed to write a function to take care of this:</p>
 <pre class="r"><code># Function to separate rows in other ratings, add ratings column ----
 # Variables: df = other_x_ratings data, rating_type = either &quot;JOY&quot; or &quot;DESPAIR&quot;
 separate_other_candy &lt;- function(df, rating_type) {
@@ -352,11 +361,13 @@ separate_other_candy &lt;- function(df, rating_type) {
            # add rating column for &quot;JOY&quot; or &quot;DESPAIR&quot;
            rating = rating_type)
 }</code></pre>
-<p>This function was then applied as below:</p>
+<p>This function <code>separate_other_candy</code> was then applied as below:</p>
 <pre class="r"><code># Use function to separate rows in other ratings, add ratings column
 other_joy_separated &lt;- separate_other_candy(other_joy_ratings, &quot;JOY&quot;)
 other_despair_separated &lt;- separate_other_candy(other_despair_ratings, &quot;DESPAIR&quot;)</code></pre>
-<p>I then used bind_rows() to join the two sets with other candy ratings together. Once this was complete, it was time to recode the values in the candy_name column. This was not an exhaustive list, but it ended up being rather long. Given more time this could be tweaked for further accuracy. Any values which did not match the regex patterns in my case_when() arguments were changed to NA values, and then dropped.</p>
+<p>I then used <code>bind_rows()</code> to join the two sets with other candy ratings together. Once this was complete, it was time to recode the values in the <code>candy_name</code> column.</p>
+<p><strong>This is not an exhaustive list, but it ended up being rather long. Given more time this could be tweaked for further accuracy.</strong></p>
+<p>Any values which did not match the regex patterns in my <code>case_when()</code> arguments were changed to <code>NA</code> values, and then dropped.</p>
 <pre class="r"><code># Recode other_ratings ----
 other_candy_recoded &lt;- other_candy_ratings %&gt;%
   mutate(candy_name = case_when(
@@ -370,7 +381,7 @@ other_candy_recoded &lt;- other_candy_ratings %&gt;%
     ) 
   ) %&gt;%
   drop_na()</code></pre>
-<p>I then joined this with my existing candy_ratings and rater_data tables to once again, have a complete table.</p>
+<p>I then joined this with my existing <code>candy_ratings</code> and <code>rater_data</code> tables to once again, have a complete table.</p>
 <pre class="r"><code># Join with candy ratings table and rater_data ----
 candy_ratings_joined &lt;- candy_ratings %&gt;%
   bind_rows(other_candy_recoded) %&gt;%
@@ -378,7 +389,8 @@ candy_ratings_joined &lt;- candy_ratings %&gt;%
   
 candy_ratings_complete &lt;- rater_data %&gt;%
   inner_join(candy_ratings_joined, by = &quot;rater_id&quot;)</code></pre>
-<p>The next step was to recode the values in countries, like above, I used case_when to replace values here. As this was a free text input there were multiple spellings for a country, in particular the USA and UK. I created variables to act as Regex patterns for USA, UK and for non-countries which would be “Not Specified”. After this I used coalesce() to replace all NA values with “Not Specified”.</p>
+<p>The next step was to recode the values in countries, like above, I used <code>case_when()</code> to replace values. As this was a free text input there were multiple spellings for a country, in particular the USA and UK.</p>
+<p>I created variables to act as regex patterns for <strong>USA</strong>, <strong>UK</strong> and for non-countries which would be <strong>“Not Specified”</strong>. After this I used <code>coalesce()</code> to replace all <code>NA</code> values with <strong>“Not Specified”</strong>.</p>
 <pre class="r"><code># Create regex patterns for recoding, then recode ----
 usa_pattern &lt;- &quot;u.s.|us|u s|amer|states|united s|rica|murrika|new y|cali|alaska|trump|pittsburgh|carolina|cascadia|yoo ess|jersey&quot;
 uk_pattern &lt;- &quot;uk|united k|england|endland|scotland&quot;
@@ -395,7 +407,8 @@ candy_countries_recoded &lt;- candy_ratings_complete %&gt;%
     country = str_to_title(country),
     country = coalesce(country, &quot;Not Specified&quot;)
   )</code></pre>
-<p>The very last step in cleaning this data was recoding our candy_names, in particular removing non-candy values. I achieved this using the same method as above. After changing all non-candy items to NA, and tidying up the candy names using case_when, I used drop_na() to remove these ratings and then added a unique ID row for every rating in the data.</p>
+<p>The very last step in cleaning this data was recoding our <code>candy_names</code>, in particular removing non-candy values. I achieved this using the same method as above.</p>
+<p>After recoding all non-candy items to <code>NA</code>, and tidying up the <code>candy_names</code> using <code>case_when()</code>, I used <code>drop_na()</code> to remove these ratings and then added a unique <code>id</code> for every rating in the data.</p>
 <pre class="r"><code># Make NA pattern for removing non-candy items and recode ----
 candy_na_pattern &lt;- &quot;Sweetums|the board game|low stick|Bottle Caps|Brach products|Chardonnay|Chick-o|Religious|Peaches|Aceta|Hugs|Kale|DVD|Blue-Ray|BooBerry|Sea-salt|Dick|Those|Vicodin|Vials|White Bread|Cash|Dental|chips|Sidewalk|Wheat|Abstained|Third Party|Green Party|Independent&quot;
 
@@ -420,16 +433,19 @@ library(here)
 # Read in clean data
 candy_data &lt;- read_csv(here(&quot;clean_data/candy_data_cleaned.csv&quot;))
 
+# Preview data
 head(candy_data)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
 {"columns":[{"label":["id"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["rater_id"],"name":[2],"type":["chr"],"align":["left"]},{"label":["year"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["age"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["gender"],"name":[5],"type":["chr"],"align":["left"]},{"label":["country"],"name":[6],"type":["chr"],"align":["left"]},{"label":["trick_or_treat"],"name":[7],"type":["chr"],"align":["left"]},{"label":["candy_name"],"name":[8],"type":["chr"],"align":["left"]},{"label":["rating"],"name":[9],"type":["chr"],"align":["left"]}],"data":[{"1":"1","2":"1-15","3":"2015","4":"35","5":"Not Specified","6":"Not Specified","7":"No","8":"Butterfinger","9":"JOY"},{"1":"2","2":"1-15","3":"2015","4":"35","5":"Not Specified","6":"Not Specified","7":"No","8":"Mary Janes","9":"DESPAIR"},{"1":"3","2":"1-15","3":"2015","4":"35","5":"Not Specified","6":"Not Specified","7":"No","8":"Any full-sized candy bar","9":"JOY"},{"1":"4","2":"1-15","3":"2015","4":"35","5":"Not Specified","6":"Not Specified","7":"No","8":"Bubble Gum","9":"DESPAIR"},{"1":"5","2":"1-15","3":"2015","4":"35","5":"Not Specified","6":"Not Specified","7":"No","8":"Cadbury Creme Eggs","9":"DESPAIR"},{"1":"6","2":"1-15","3":"2015","4":"35","5":"Not Specified","6":"Not Specified","7":"No","8":"Generic Candy","9":"DESPAIR"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
+<p><br></p>
 <div id="question-1" class="section level2" number="4.1">
 <h2 number="4.1"><span class="header-section-number">4.1</span> Question 1</h2>
 <p><strong>What is the total number of candy ratings given across the three years. (number of candy ratings, not number of raters. Don’t count missing values)</strong></p>
-<p>To answer this question I have dropped all rows with no rating, then summarised using n() to find the total number of rows. Note: Using drop_na() wasn’t necessary here as the clean data has already had all NA values removed.</p>
+<p>To answer this question I used <code>drop_na()</code> to remove all rows with no rating, then summarised with <code>n()</code> to find the total number of ratings.</p>
+<p><strong>Note: Using <code>drop_na()</code> wasn’t necessary here as the clean data has already had all NA values removed.</strong></p>
 <pre class="r"><code>candy_data %&gt;%
   drop_na(rating) %&gt;%
   summarise(total_num_ratings = n())</code></pre>
@@ -438,11 +454,13 @@ head(candy_data)</code></pre>
 {"columns":[{"label":["total_num_ratings"],"name":[1],"type":["int"],"align":["right"]}],"data":[{"1":"595654"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
+<p><br></p>
 </div>
 <div id="question-2-and-3" class="section level2" number="4.2">
 <h2 number="4.2"><span class="header-section-number">4.2</span> Question 2 and 3</h2>
 <p><strong>What was the average age of people who are going out trick or treating?</strong> <strong>What was the average age of people who are not going trick or treating?</strong></p>
-<p>First I have dropped NA values in the age column, and filtered for distinct values of rater_id so we had one age per rater. Then I grouped by trick_or_treat and summarised to find the mean age per response to the trick or treat question. I’ve grouped these questions together as I thought it would be interesting to see the average age of those who did not respond to the question also.</p>
+<p>First I have dropped <code>NA</code> values in the <code>age</code> column, and used <code>distinct()</code> on <code>rater_id</code> so we had one age per <code>rater_id.</code> Then I grouped by <code>trick_or_treat</code> and summarised to find the mean age per response to the trick or treat question.</p>
+<p>I’ve grouped these questions together as I thought it would also be interesting to see the average age of those who did not respond to the question.</p>
 <pre class="r"><code>candy_data %&gt;%
   drop_na(age) %&gt;%
   distinct(rater_id, .keep_all = TRUE) %&gt;%
@@ -453,11 +471,13 @@ head(candy_data)</code></pre>
 {"columns":[{"label":["trick_or_treat"],"name":[1],"type":["chr"],"align":["left"]},{"label":["average_age"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"No","2":"39.0"},{"1":"Not Specified","2":"42.3"},{"1":"Yes","2":"34.8"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
+<p><br></p>
 </div>
 <div id="question-4" class="section level2" number="4.3">
 <h2 number="4.3"><span class="header-section-number">4.3</span> Question 4</h2>
-<p><strong>For each of joy, despair and meh, which candy bar recieved the most of these ratings?</strong></p>
-<p>First I have grouped by both rating and candy_name, then used summarise to count the number of each rating per candy using n(). After this I used slice_max() to pick the top result in each rating. Note: I have included the with_ties argument in the event of two candies having the same amount of ratings.</p>
+<p><strong>For each of joy, despair and meh, which candy bar received the most of these ratings?</strong></p>
+<p>First I used <code>group_by()</code> for both <code>rating</code> and <code>candy_name</code>, then used <code>summarise()</code> to count the number of each rating per candy using <code>n()</code>. After this I used <code>slice_max()</code> to pick the top result in each <code>rating</code>.</p>
+<p><strong>Note: I have included the <code>with_ties</code> argument in the event of two candies having the same amount of ratings.</strong></p>
 <pre class="r"><code>candy_data %&gt;%
   group_by(rating, candy_name) %&gt;%
   summarise(number_ratings = n()) %&gt;%
@@ -467,11 +487,12 @@ head(candy_data)</code></pre>
 {"columns":[{"label":["rating"],"name":[1],"type":["chr"],"align":["left"]},{"label":["candy_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["number_ratings"],"name":[3],"type":["int"],"align":["right"]}],"data":[{"1":"DESPAIR","2":"Bubble Gum","3":"11180"},{"1":"JOY","2":"Any full-sized candy bar","3":"7589"},{"1":"MEH","2":"Jolly Rancher","3":"2151"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
+<p><br></p>
 </div>
 <div id="question-5" class="section level2" number="4.4">
 <h2 number="4.4"><span class="header-section-number">4.4</span> Question 5</h2>
 <p><strong>How many people rated Starburst as despair?</strong></p>
-<p>To find this, first I have filtered by candy_name and rating, so we are left with only rows matching Starburst and despair. Then I used summarise and n() to find the total number of despair ratings.</p>
+<p>To find this, first I have filtered by <code>candy_name</code> and <code>rating</code>, so we are left with only rows matching “<strong>Starburst</strong>” and “<strong>DESPAIR</strong>”. Then I used <code>summarise</code> and <code>n()</code> to find the total number of DESPAIR ratings.</p>
 <pre class="r"><code>candy_data %&gt;%
   filter(candy_name == &quot;Starburst&quot;,
          rating == &quot;DESPAIR&quot;) %&gt;%
@@ -481,8 +502,9 @@ head(candy_data)</code></pre>
 {"columns":[{"label":["starburst_despair_count"],"name":[1],"type":["int"],"align":["right"]}],"data":[{"1":"1991"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
+<p><br></p>
 <p><strong>For the next three questions, count despair as -1, joy as +1 and meh as 0.</strong></p>
-<p>Using case_when(), I have recoded the values in the rating column to match the numeric values, and also changed the variable type using as.integer() to avoid any potential errors during calculation.</p>
+<p>Using <code>case_when()</code>, I have recoded the values in the <code>rating</code> column to match the numeric values, and also changed the variable type using <code>as.integer()</code> to avoid any potential errors during calculation.</p>
 <pre class="r"><code>candy_rating_int &lt;- candy_data %&gt;%
   mutate(rating = as.integer(case_when(
     rating == &quot;JOY&quot; ~ 1,
@@ -490,11 +512,12 @@ head(candy_data)</code></pre>
     rating == &quot;DESPAIR&quot; ~ -1)
     )
   )</code></pre>
+<p><br></p>
 </div>
 <div id="question-6" class="section level2" number="4.5">
 <h2 number="4.5"><span class="header-section-number">4.5</span> Question 6</h2>
 <p><strong>What was the most popular candy bar by this rating system for each gender in the dataset?</strong></p>
-<p>Using our new dataset with integer values as ratings, I’ve first grouped by gender and candy_name, then summarised using sum(rating) to calculate the total rating for each candy. After this I used slice_max() to pick the highest rated candy of each gender.</p>
+<p>Using our new dataset with integer values as ratings, I’ve first grouped by <code>gender</code> and <code>candy_name</code>, then summarised using <code>sum(rating)</code> to calculate the <code>total_rating</code> for each candy. After this I used <code>slice_max()</code> to return the highest rated candy of each <code>gender</code>.</p>
 <pre class="r"><code>candy_rating_int %&gt;%
   group_by(gender, candy_name) %&gt;%
   summarise(total_rating = sum(rating)) %&gt;%
@@ -504,7 +527,7 @@ head(candy_data)</code></pre>
 {"columns":[{"label":["gender"],"name":[1],"type":["chr"],"align":["left"]},{"label":["candy_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["total_rating"],"name":[3],"type":["int"],"align":["right"]}],"data":[{"1":"Female","2":"Any full-sized candy bar","3":"875"},{"1":"I'd rather not say","2":"Any full-sized candy bar","3":"68"},{"1":"Male","2":"Any full-sized candy bar","3":"1584"},{"1":"Not Specified","2":"Any full-sized candy bar","3":"4618"},{"1":"Other","2":"Any full-sized candy bar","3":"37"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<p>As we can see from the result, “Any full-sized candy bar” has the highest rating for every gender. As this is quite a general definition, we are likely to get better answers to this question if we filter this out from our results:</p>
+<p>As we can see from the result, “<strong>Any full-sized candy bar</strong>” has the highest rating for every gender. As this is quite a general definition, we are likely to get better answers to this question if we filter this out from our results:</p>
 <pre class="r"><code>  candy_rating_int %&gt;%
   filter(candy_name != &quot;Any full-sized candy bar&quot;) %&gt;%
   group_by(gender, candy_name) %&gt;%
@@ -515,11 +538,12 @@ head(candy_data)</code></pre>
 {"columns":[{"label":["gender"],"name":[1],"type":["chr"],"align":["left"]},{"label":["candy_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["total_rating"],"name":[3],"type":["int"],"align":["right"]}],"data":[{"1":"Female","2":"Kit Kat","3":"773"},{"1":"I'd rather not say","2":"Kit Kat","3":"63"},{"1":"Male","2":"Reese's Peanut Butter Cups","3":"1445"},{"1":"Not Specified","2":"Reese's Peanut Butter Cups","3":"4394"},{"1":"Other","2":"Twix","3":"32"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
+<p><br></p>
 </div>
 <div id="question-7" class="section level2" number="4.6">
 <h2 number="4.6"><span class="header-section-number">4.6</span> Question 7</h2>
 <p><strong>What was the most popular candy bar in each year?</strong></p>
-<p>Using the same method as Question 6, I first grouped by year and candy_name, then summarised using sum(rating) to find the total_rating for each candy, and used slice_max() to pick the highest rated candy per year.</p>
+<p>Using the same method as Question 6, I first grouped by <code>year</code> and <code>candy_name</code>, then summarised using <code>sum(rating)</code> to find the <code>total_rating</code> for each candy, and used <code>slice_max()</code> to return the highest rated candy per <code>year</code>.</p>
 <pre class="r"><code>candy_rating_int %&gt;%
   group_by(year, candy_name) %&gt;%
   summarise(total_rating = sum(rating)) %&gt;%
@@ -529,7 +553,7 @@ head(candy_data)</code></pre>
 {"columns":[{"label":["year"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["candy_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["total_rating"],"name":[3],"type":["int"],"align":["right"]}],"data":[{"1":"2015","2":"Any full-sized candy bar","3":"4603"},{"1":"2016","2":"Any full-sized candy bar","3":"1037"},{"1":"2017","2":"Any full-sized candy bar","3":"1542"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<p>Similar to Question 6, “Any full-sized candy bar” is the highest rated for each year. If we filter it out from our results the answer is as follows:</p>
+<p>Like Question 6, “<strong>Any full-sized candy bar</strong>” is the highest rated for each year. If we filter it out from our results the answer is as follows:</p>
 <pre class="r"><code>candy_rating_int %&gt;%
   filter(candy_name != &quot;Any full-sized candy bar&quot;) %&gt;%
   group_by(year, candy_name) %&gt;%
@@ -540,13 +564,14 @@ head(candy_data)</code></pre>
 {"columns":[{"label":["year"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["candy_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["total_rating"],"name":[3],"type":["int"],"align":["right"]}],"data":[{"1":"2015","2":"Reese's Peanut Butter Cups","3":"4378"},{"1":"2016","2":"Kit Kat","3":"924"},{"1":"2017","2":"Reese's Peanut Butter Cups","3":"1404"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
+<p><br></p>
 </div>
 <div id="question-8." class="section level2" number="4.7">
 <h2 number="4.7"><span class="header-section-number">4.7</span> Question 8.</h2>
 <p><strong>What was the most popular candy bar by this rating for people in US, Canada, UK and all other countries?</strong></p>
-<p>Here we are looking for all countries other than US, UK and Canada to be classed as “Other”.</p>
-<p>To achieve this I used case_when() and str_detect() to keep all values in countries the same if they matched “United Kingdom”, “United States” or “Canada”. Any other values will be changed to “Other”.</p>
-<p>Now we can group by country and candy_name, summarise using sum(rating) and find the candy with the highest total_rating for each country using slice_max()</p>
+<p>Here we are looking for all countries other than <strong>US</strong>, <strong>UK</strong> and <strong>Canada</strong> to be classed as “<strong>Other</strong>”.</p>
+<p>To achieve this I used <code>case_when()</code> and <code>str_detect()</code> to keep all values in countries the same if they matched “United Kingdom”, “United States” or “Canada”. Any other values will be changed to “Other”.</p>
+<p>Now we can <code>group_by()</code> <code>country</code> and <code>candy_name</code>, <code>summarise()</code> using <code>sum(rating)</code> and find the candy with the highest <code>total_rating</code> for each <code>country</code> using <code>slice_max()</code></p>
 <pre class="r"><code>candy_rating_int %&gt;%
   mutate(country = case_when(
     str_detect(country, &quot;United Kingdom|United States|Canada&quot;) ~ country,
@@ -560,8 +585,9 @@ head(candy_data)</code></pre>
 {"columns":[{"label":["country"],"name":[1],"type":["chr"],"align":["left"]},{"label":["candy_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["total_rating"],"name":[3],"type":["int"],"align":["right"]}],"data":[{"1":"Canada","2":"Any full-sized candy bar","3":"253"},{"1":"Other","2":"Any full-sized candy bar","3":"4710"},{"1":"United Kingdom","2":"Any full-sized candy bar","3":"33"},{"1":"United Kingdom","2":"Lindt","3":"33"},{"1":"United Kingdom","2":"Rolos","3":"33"},{"1":"United Kingdom","2":"Toblerone","3":"33"},{"1":"United States","2":"Any full-sized candy bar","3":"2186"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<p>As with Q6 and Q7, “Any full-sized candy bar” has taken the top spot for every country. Interestingly the UK has 4 tied results for the total_rating, a good example of why the with_ties argument in slice_max() is useful!</p>
-<p>If we filter out “Any full-sized candy bar” again, the results are:</p>
+<p>As with Q6 and Q7, “<strong>Any full-sized candy bar</strong>” has taken the top spot for every <code>country</code>.</p>
+<p>Interestingly the UK has <strong>4 tied results</strong> for the <code>total_rating</code>, a good example of why the <code>with_ties</code> argument in <code>slice_max()</code> is useful!</p>
+<p>If we filter out “<strong>Any full-sized candy bar</strong>” again, the results are:</p>
 <pre class="r"><code>candy_rating_int %&gt;%
   filter(candy_name != &quot;Any full-sized candy bar&quot;) %&gt;%
   mutate(country = case_when(
