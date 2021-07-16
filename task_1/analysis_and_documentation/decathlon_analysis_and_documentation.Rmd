@@ -1,20 +1,99 @@
 ---
 title: "Task 1 - Decathlon Data"
-output: html_notebook
+author: "Lee McDonald - DE9"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+  pdf_document: default
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F)
+```
 
+# Introduction
+
+For this task we've been given a dataset of decathlon data, containing athletes' scores on different events and their overall points/rank in the competition.
+
+At first glance, the data doesn't look bad as it is complete with no missing values, however there are some things we can do to make it more "tidy" and suitable for our analysis.
+
+<br>
+
+# Assumptions
+
+To answer the questions we have been asked, I will be removing event data not relevant to the events **100m**, **400m**, **Long jump** and **Shot-put**.
+
+I have also assumed as this is a small dataset, that the recurring names between the Decastar" and "OlympicG" competitions are the same atheletes.
+
+<br>
+
+# Data Cleaning
+
+I used the packages **tidyverse**, **janitor** and **here** to clean this dataset.
+
+The first step I took was to remove the row names and create a new column `name` using `rownames_to_column()`. I then created a unique `athlete_id` for each athlete, by first changing all names to the same case, grouping by `name`, then using `cur_group_id()` which generates an id for each value in the current group.
+
+```{r eval=FALSE}
+decathlon_cleaned <- decathlon_data %>%
+  # Change row names to column called "name"
+  rownames_to_column(var = "name") %>%
+  # Create unique id for each athlete
+  mutate(name = str_to_title(name)) %>%
+  group_by(name) %>%
+  mutate(athlete_id = cur_group_id()) %>%
+  ungroup() %>%
+```
+
+Next, I used `select()` to rearrange the columns and drop any event columns that we did not require for analysis. I then used `pivot_longer()` to change the data to long format, with each observation being an athlete's `score` in an `event`.
+
+```{r eval=FALSE}
+  # rearrange columns and drop columns not needed for analysis
+  select(athlete_id, name, Competition, Points, Rank, Long.jump, "100m", Shot.put, "400m") %>%
+  # Convert into long format
+  pivot_longer(Long.jump:"400m", names_to = "event", values_to = "score") %>%
+```
+
+Now that the data is in long format, I created a unique `id` for each observation using `row_number()`, and then used `select()` to bring this to the first column.
+
+```{r eval=FALSE}
+  # Create id for each observation,
+  mutate(id = row_number()) %>%
+  # Move id column to front
+  select(id, everything()) %>%
+```
+
+Finally, I used `clean_names()` to tidy up the remaining column names, and used `str_replace()` to remove the "." character that was in some of the `event` names and replace it with a space.
+
+```{r eval=FALSE}
+  # clean column names
+  clean_names() %>%
+  # replace "." in event names with a space
+  mutate(event = str_replace(event, "\\.", " "))
+```
+
+<br>
+
+# Analysis
 
 ```{r}
 library(tidyverse)
 library(here)
-```
 
-```{r}
+# Read in clean data
 decathlon_data <- read_csv(here("clean_data/decathlon_cleaned.csv"))
+
+# Preview data
+decathlon_data
 ```
 
+<br>
 
-## 1. Who had the longest long jump seen in the data?
+## Question 1 
+**Who had the longest long jump seen in the data?**
+
+First I selected the columns we needed, then filtered for "Long jump" in the `event` column, and used `slice_max()` to pick the top result.
 
 ```{r}
 decathlon_data %>%
@@ -22,11 +101,12 @@ decathlon_data %>%
   filter(event == "Long jump") %>%
   slice_max(score, with_ties = TRUE)
 ```
-Clay had the longest long jump in this dataset.
+<br>
 
+## Question 2 
+**What was the average 100m time in each competition?**
 
-## 2. What was the average 100m time in each competition?
-
+First `group_by()` for `competition`, then `filter()` for only 100m scores, and `summarise()` to find the `mean()` `score` for each competition.
 ```{r}
 decathlon_data %>%
   group_by(competition) %>%
@@ -34,10 +114,13 @@ decathlon_data %>%
   summarise(avg_100m_time = mean(score))
   
 ```
-Average 100m time for Decastar was 11.2s and OlympicG 10.9s
+<br>
 
 
-## 3. Who had the highest total points across both competitions?
+## Question 3 
+**Who had the highest total points across both competitions?**
+
+Here I first selected the columns `name`, `points` and `competition` and used distinct() to return only one row of an athlete's `points` per `competition`. I then grouped by `name`, and used `summarise()` to find the `sum()` of each athlete's `points.` Finally `slice_max()` picked the top scoring athlete.
 
 ```{r}
 decathlon_data %>%
@@ -47,11 +130,15 @@ decathlon_data %>%
   summarise(total_points = sum(points)) %>%
   slice_max(total_points, n = 1, with_ties = TRUE)
 ```
-Sebrle with 17110 total points
+<br>
 
 
-## 4. What was the shot-put scores for the top three competitors in each competition?
+## Question 4 
+**What was the shot-put scores for the top three competitors in each competition?**
 
+First, I grouped by `competition`, then used `filter()` to return only "Shot put" scores in `event`. 
+
+I then used `slice_min()` to find the top three ranked athletes, and finally `select()` to return `name`, `competition`, `rank` and `score`.
 ```{r}
 decathlon_data %>%
   group_by(competition) %>%
@@ -60,7 +147,14 @@ decathlon_data %>%
   select(name, competition, rank, score)
 ```
 
-## 5. What was the average points for competitors who ran the 400m in less than 50 seconds vs. those than ran 400m in more than 50 seconds?
+<br>
+
+## Question 5 
+**What was the average points for competitors who ran the 400m in less than 50 seconds vs. those than ran 400m in more than 50 seconds?**
+
+To find this, I filtered to return only rows for the "400m" `event`, then used `mutate()` and `if_else()` to create a new column `time_400m` with the value "**Less than 50s**" or "**More than 50s**".
+
+I then grouped by the new `time_400m` column, and used `summarise()` to find the `mean()` points of these groups.
 
 ```{r}
 decathlon_data %>%

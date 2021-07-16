@@ -143,39 +143,45 @@ dog_survey <- read_csv(here("clean_data/dog_survey_clean.csv"))
 # Preview data
 dog_survey
 ```
-
+<br>
 
 ## Question 1 
 **The client only counts a valid email address as one ending in ‘.com’. How many survey results have a valid email address?**
 
+Using `str_detect()` with a regex pattern, we can then find the `sum()` of all "valid" email addresses.
 ```{r}
 dog_survey %>%
   summarise(total_valid_email = sum(str_detect(email, "\\.com$"), na.rm = TRUE))
 ```
 
+<br>
+
 ## Question 2 
 **What’s the average amount spent on dog food for each dog size?**
 
+First `group_by(dog_size)` then `summarise()` to find the `mean()` value of `food_spend`. Here I have used `round()` to round the result to 2 decimal places.
 ```{r}
 dog_survey %>%
   group_by(dog_size) %>%
   summarise(avg_food_spend = round(mean(food_spend, na.rm = TRUE), 2))
 ```
+<br>
 
 ## Question 3 
 **For owners whose surname starts with a letter in the second half of the alphabet (N onwards) what is the average age of their dog?**
 
-
+To find this I have filtered using `str_detect()` and used a regex string to find `last_name` values that begin with N-Z, then summarised to find the `mean()` value of `dog_age`.
 ```{r}
 dog_survey %>%
   filter(str_detect(last_name, "^[N-Z]")) %>%
   summarise(avg_dog_age = round(mean(dog_age, na.rm = TRUE), 1))
 ```
-
+<br>
 
 ## Question 4 
 **The dog_age column is the age in dog years. If the conversion is 1 human year = 6 dog years, then what is the average human age for dogs of each gender?**
 
+Use `mutate()` to divide dog_age by 6, then `group_by()` gender and use `summarise()` to find the `mean()` human age for each `dog_gender`.
 ```{r}
 dog_human_age_avg <- dog_survey %>%
   mutate(dog_age_human = dog_age / 6) %>%
@@ -184,9 +190,13 @@ dog_human_age_avg <- dog_survey %>%
 
 dog_human_age_avg
 ```
+<br>
 
 ## Question 5 
 **Create a plot of results of question 4.**
+
+(Not used this before)
+I used `ggplot()` to initialise the plot, assigned the x and y variables, then drew the scatter points using `geom_point()`
 ```{r}
 ggplot(dog_human_age_avg, aes(x = dog_gender, y = avg_human_age)) +
   geom_point()
