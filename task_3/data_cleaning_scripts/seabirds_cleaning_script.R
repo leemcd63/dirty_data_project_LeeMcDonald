@@ -34,6 +34,7 @@ create_age_column <- function(df,col) {
     )
 }
 
+
 # function to check for age code in columns and remove ----
 remove_ages <- function(x) {
   if (is.character(x)) {

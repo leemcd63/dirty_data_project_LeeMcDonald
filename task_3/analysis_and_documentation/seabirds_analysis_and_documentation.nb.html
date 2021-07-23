@@ -217,13 +217,37 @@ pre code {
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VhYmlyZHMgPC0gcmVhZF9jc3YoaGVyZShcImNsZWFuX2RhdGEvc2VhYmlyZHNfY2xlYW5lZC5jc3ZcIikpXG5cbmBgYCJ9 -->
-<pre class="r"><code>seabirds &lt;- read_csv(here(&quot;clean_data/seabirds_cleaned.csv&quot;))
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5cbmBgYCJ9 -->
+<pre class="r"><code>library(tidyverse)
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG7ilIDilIAgQ29sdW1uIHNwZWNpZmljYXRpb24g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5jb2xzKFxuICBpZCA9IGNvbF9kb3VibGUoKSxcbiAgcmVjb3JkX2lkID0gY29sX2RvdWJsZSgpLFxuICBjb21tb25fbmFtZSA9IGNvbF9jaGFyYWN0ZXIoKSxcbiAgc2NpZW50aWZpY19uYW1lID0gY29sX2NoYXJhY3RlcigpLFxuICBhYmJyZXZpYXRpb24gPSBjb2xfY2hhcmFjdGVyKCksXG4gIGNvdW50ID0gY29sX2RvdWJsZSgpLFxuICBsYXQgPSBjb2xfZG91YmxlKCksXG4gIGFnZSA9IGNvbF9jaGFyYWN0ZXIoKVxuKVxuIn0= -->
+<!-- rnb-output-begin eyJkYXRhIjoiUmVnaXN0ZXJlZCBTMyBtZXRob2RzIG92ZXJ3cml0dGVuIGJ5ICdkYnBseXInOlxuICBtZXRob2QgICAgICAgICBmcm9tXG4gIHByaW50LnRibF9sYXp5ICAgICBcbiAgcHJpbnQudGJsX3NxbCAgICAgIFxu4pSA4pSAIEF0dGFjaGluZyBwYWNrYWdlcyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAgdGlkeXZlcnNlIDEuMy4xIOKUgOKUgFxu4pyTIGdncGxvdDIgMy4zLjQgICAgIOKckyBwdXJyciAgIDAuMy40XG7inJMgdGliYmxlICAzLjEuMiAgICAg4pyTIGRwbHlyICAgMS4wLjdcbuKckyB0aWR5ciAgIDEuMS4zICAgICDinJMgc3RyaW5nciAxLjQuMFxu4pyTIHJlYWRyICAgMS40LjAgICAgIOKckyBmb3JjYXRzIDAuNS4xXG7ilIDilIAgQ29uZmxpY3RzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgCB0aWR5dmVyc2VfY29uZmxpY3RzKCkg4pSA4pSAXG54IGRwbHlyOjpmaWx0ZXIoKSBtYXNrcyBzdGF0czo6ZmlsdGVyKClcbnggZHBseXI6OmxhZygpICAgIG1hc2tzIHN0YXRzOjpsYWcoKVxuIn0= -->
+<pre><code>Registered S3 methods overwritten by &#39;dbplyr&#39;:
+  method         from
+  print.tbl_lazy     
+  print.tbl_sql      
+── Attaching packages ────────────────────────────────── tidyverse 1.3.1 ──
+✓ ggplot2 3.3.4     ✓ purrr   0.3.4
+✓ tibble  3.1.2     ✓ dplyr   1.0.7
+✓ tidyr   1.1.3     ✓ stringr 1.4.0
+✓ readr   1.4.0     ✓ forcats 0.5.1
+── Conflicts ───────────────────────────────────── tidyverse_conflicts() ──
+x dplyr::filter() masks stats::filter()
+x dplyr::lag()    masks stats::lag()</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5saWJyYXJ5KGhlcmUpXG5gYGAifQ== -->
+<pre class="r"><code>library(tidyverse)
+library(here)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiaGVyZSgpIHN0YXJ0cyBhdCAvVXNlcnMvbGVlc29uL2RpcnR5X2RhdGFfcHJvamVjdF9MZWVNY0RvbmFsZC90YXNrXzNcbiJ9 -->
+<pre><code>here() starts at /Users/leeson/dirty_data_project_LeeMcDonald/task_3</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VhYmlyZHMgPC0gcmVhZF9jc3YoaGVyZShcImNsZWFuX2RhdGEvc2VhYmlyZHNfY2xlYW5lZC5jc3ZcIikpXG5gYGAifQ== -->
+<pre class="r"><code>seabirds &lt;- read_csv(here(&quot;clean_data/seabirds_cleaned.csv&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG7ilIDilIAgQ29sdW1uIHNwZWNpZmljYXRpb24g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5jb2xzKFxuICBpZCA9IGNvbF9kb3VibGUoKSxcbiAgcmVjb3JkX2lkID0gY29sX2RvdWJsZSgpLFxuICBjb21tb25fbmFtZSA9IGNvbF9jaGFyYWN0ZXIoKSxcbiAgc2NpZW50aWZpY19uYW1lID0gY29sX2NoYXJhY3RlcigpLFxuICBhYmJyZXZpYXRpb24gPSBjb2xfY2hhcmFjdGVyKCksXG4gIGNvdW50ID0gY29sX2RvdWJsZSgpLFxuICBsYXQgPSBjb2xfZG91YmxlKCksXG4gIGFnZSA9IGNvbF9jaGFyYWN0ZXIoKVxuKVxuIn0= -->
 <pre><code>
-── Column specification ────────────────────────────────────────────────────────────────────────────────
+── Column specification ───────────────────────────────────────────────────
 cols(
   id = col_double(),
   record_id = col_double(),
@@ -252,7 +276,7 @@ cols(
 <!-- rnb-output-begin eyJkYXRhIjoiYHN1bW1hcmlzZSgpYCBoYXMgZ3JvdXBlZCBvdXRwdXQgYnkgJ2NvbW1vbl9uYW1lJywgJ3NjaWVudGlmaWNfbmFtZScuIFlvdSBjYW4gb3ZlcnJpZGUgdXNpbmcgdGhlIGAuZ3JvdXBzYCBhcmd1bWVudC5cbiJ9 -->
 <pre><code>`summarise()` has grouped output by &#39;common_name&#39;, &#39;scientific_name&#39;. You can override using the `.groups` argument.</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6NCwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIHggNCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUEyVlJUVS9ETUF6MVNndGErUmpTZmdDOW81VURRdUtLVkpDNERBbHRvcmZKYmJNdElrMm1Kb1VkK2NmOGd3Mm5hNlFwUkVwaVA5dng4OHQ3bHQvSGVRd0FKeEFPNkl6SWhHZytlNWs4QW9RQk9RTUlZV2p2TFlYSFpJUzByNDhDNHcrVUZXdTRYQ1VvQ2pTTjB0cEx1Y200cWxuRk1FRnArRVpWVEdxdWs3dUViVnVCMGs4ZlpxOXZUOVBaY3o0bjU3SUx3TzJ2eHllU1dETlhHZmJnZWFucVdzbUZqZlhRU0plY1VkY2xMNC9oQ3l5S2huMXhORnhKbDJxVVFiSFFmTFUyTkk3Mk9nNGI5WjI2cnBaVzhFUEhucFpQclJUNFQ0TzRRb1Bwc3JFVUFIWmV5Wm5hV0NKVUZGaU5JNjk0MEhqQXFKV1dTVFVwMTYzOG5EellCZ2VodXRXTDFtMW5oNGVXd2I1L0t1cWZPbVZ5eGFYVEpSSllNTkU3VnpSeE4zQzZvZjgxYmhKQ2RkcHA1WkJTQ1lkMHM4SHVEOG8xc3BSYUFnQUEifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6NCwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIHggNCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUEyVlJUVS9ETUF6MVNndnErQmpTZmdDOW81WERMbHlSQ2hJWEpxRk43RGE1YmJaRnBFblZwTEFqLzVoL3NPRjBqVFNGU0Vuc1p6dCtmbm5QbHRQaGNnZ0FaeEFPNkl6SWhHZ3hmNWs4QW9RQk9RTUlJYmIzanNKak1rTGF0eWVCOFFmS2tqVmNiaElVT1pwR2FlMmwzR1ZjVmF4a21LQTB2RllsazVycjVDRmh1MWFnOU5QajdIWDI5RFovWGk3SXVlNENjUC9yOFlra1ZzeFZoajE0V2FpcVVuSmxZejAwMGdWbjFIWE5pMVA0Q3ZPOFlWOGNEVmZTcFJwbFVLdzAzMndOamFPOWpuR2p2bFBYMWRJS2Z1ZzQwUEtwRlFML2FUQXMwV0M2Yml3RmdMMVhjcUZxUzRTS0FxdHg1QlVQR2c4WXRkSXlLU2ZGdHBXZms2bHRjQlNxVzcxbzNYWjJlR3daSFBxbm92NnBjeVkzWERwZElvRTVFNzF6UXhOM0E2YzEvYTl4a3hDcTAwNHJoeFJLT0tTYkRmWi9SLzhIQkZvQ0FBQT0ifQ== -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
 {"columns":[{"label":["common_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["scientific_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["abbreviation"],"name":[3],"type":["chr"],"align":["left"]},{"label":["total_sightings"],"name":[4],"type":["int"],"align":["right"]}],"data":[{"1":"Wandering albatross","2":"Diomedea antipodensis / exulans","3":"DIOANTEXU","4":"11247"}],"options":{"columns":{"min":{},"max":[10],"total":[4]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}

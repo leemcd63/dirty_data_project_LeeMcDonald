@@ -342,9 +342,11 @@ candy_rating_int %>%
   summarise(total_rating = sum(rating)) %>%
   slice_max(total_rating, n = 1, with_ties = TRUE)
 ```
+
 As we can see from the result, "**Any full-sized candy bar**" has the highest rating for every gender. As this is quite a general definition, we are likely to get better answers to this question if we filter this out from our results:
+
 ```{r}
-  candy_rating_int %>%
+candy_rating_int %>%
   filter(candy_name != "Any full-sized candy bar") %>%
   group_by(gender, candy_name) %>%
   summarise(total_rating = sum(rating)) %>%

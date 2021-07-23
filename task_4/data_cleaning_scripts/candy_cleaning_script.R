@@ -24,7 +24,7 @@ tidy_candy_data <- function(df, df_year) {
            other_despair = matches("DESPAIR")) %>%
     # extract ages, convert to integer, coercing characters to NA
     mutate(age = as.integer(str_extract(age, "[0-9]{1,2}")),
-    # create unique rater_id based on year and row number
+    # create unique rater_id based on year and row number e.g. 1-15
            rater_id = str_c(row_number(), "-",str_extract(df_year, "[0-9]{2}$")),
     # create year column
            year = df_year) %>%
